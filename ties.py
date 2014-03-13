@@ -32,6 +32,7 @@ KNOT_NAMES = ( "The Corinthian"
               ,"The Babbge"
               ,"The Turing"
               ,"The Brimley"
+              ,"The Subtle -Ism"
 
     )
 NAMED_KNOTS = { "Lo Ri Co Ti": "*The Oriental"
@@ -92,14 +93,23 @@ def random_walk(walk=[]):
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
 
-def print_knot(list):
+def render_knot(list):
     str_list = [str(node) for node in list]
     knot_str = " ".join(str_list)
     if knot_str in NAMED_KNOTS:
         name = NAMED_KNOTS[knot_str]
     else:
         name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
-    print("{}: {}".format(name, knot_str))
+    return "{}: {}".format(name, knot_str)
+
+def produce_knot(num=1):
+    knots = []
+    for i in range(num):
+        knot = render_knot(random_walk())
+        if knot not in knots:
+            knots.append(knot)
+    return "\n".join(knots)
+
 
 class Node(object):
     """
@@ -137,6 +147,5 @@ class Node(object):
         return children
 
 if __name__ == "__main__":
-    for i in range(1,25):
-        print_knot(random_walk())
+    print(produce_knot(25))
 
