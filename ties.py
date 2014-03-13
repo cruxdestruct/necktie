@@ -37,29 +37,29 @@ KNOT_NAMES = ( "The Corinthian"
     )
 NAMED_KNOTS = { "Lo Ri Co Ti": "*The Oriental"
               ,"Li Ro Li Co Ti": "*The Four-in-Hand"
-              ,"Lo Ri Lo Ri Co T": "*The Kelvin"
-              ," Lo Ci Ro Li Co T": "*The Nicky"
-              ,"Lo Ci Lo Ri Co T": "*The Pratt aka The Shelby"
-              ,"Li Ro Li Ro Li Co T": "*The Victoria"
-              ,"Li Ro Ci Lo Ri Co T": "*The Half-Windsor"
-              ,"Li Ro Ci Ro Li Co T": "*The co-Half-Windsor"
-              ,"Lo Ri Lo Ci Ro Li Co T": "*The St. Andrew"
-              ,"Lo Ri Lo Ci Lo Ri Co T": "*The co-St. Andrew"
-              ,"Lo Ci Ro Ci Lo Ri Co T": "*The Plattsburgh"
-              ,"Lo Ci Ro Ci Ro Li Co T": "*The co-Plattsburgh"
-              ,"Li Ro Li Co Ri Lo Ri Co T": "*The Cavendish"
-              ,"Li Co Ri Lo Ci Ro Li Co T": "*The Windsor"
-              ,"Li Co Li Ro Ci Lo Ri Co T ": "*The co-Windsor"
-              ,"Li Co Ri Lo Ci Lo Ri Co T": "*The co-Winsdor 2"
-              ,"Li Co Li Ro Ci Ro Li Co T": "*The co-Windsor 3"
-              ,"Lo Ri Lo Ri Co Li Ro Li Co T": "*The Grantchester"
-              ,"Lo Ri Lo Ri Co Ri Lo Ri Co T": "*The co-Grantchester"
-              ,"Lo Ri Co Li Ro Ci Lo Ri Co T": "*The Hanover"
-              ,"Lo Ri Co Ri Lo Ci Ro Li Co T": "*The co-Hanover"
-              ,"Lo Ri Co Li Ro Ci Ro Li Co T": "*The co-Hanover 2"
-              ,"Lo Ri Co Ri Lo Ci Lo Ri Co T": "*The co-Hanover 3"
-              ,"Lo Ci Ro Ci Lo Ci Ro Li Co T": "*The Balthus"
-              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co T": "*The co-Balthus"
+              ,"Lo Ri Lo Ri Co Ti": "*The Kelvin"
+              ," Lo Ci Ro Li Co Ti": "*The Nicky"
+              ,"Lo Ci Lo Ri Co Ti": "*The Pratt aka The Shelby"
+              ,"Li Ro Li Ro Li Co Ti": "*The Victoria"
+              ,"Li Ro Ci Lo Ri Co Ti": "*The Half-Windsor"
+              ,"Li Ro Ci Ro Li Co Ti": "*The co-Half-Windsor"
+              ,"Lo Ri Lo Ci Ro Li Co Ti": "*The St. Andrew"
+              ,"Lo Ri Lo Ci Lo Ri Co Ti": "*The co-St. Andrew"
+              ,"Lo Ci Ro Ci Lo Ri Co Ti": "*The Plattsburgh"
+              ,"Lo Ci Ro Ci Ro Li Co Ti": "*The co-Plattsburgh"
+              ,"Li Ro Li Co Ri Lo Ri Co Ti": "*The Cavendish"
+              ,"Li Co Ri Lo Ci Ro Li Co Ti": "*The Windsor"
+              ,"Li Co Li Ro Ci Lo Ri Co Ti ": "*The co-Windsor"
+              ,"Li Co Ri Lo Ci Lo Ri Co Ti": "*The co-Winsdor 2"
+              ,"Li Co Li Ro Ci Ro Li Co Ti": "*The co-Windsor 3"
+              ,"Lo Ri Lo Ri Co Li Ro Li Co Ti": "*The Grantchester"
+              ,"Lo Ri Lo Ri Co Ri Lo Ri Co Ti": "*The co-Grantchester"
+              ,"Lo Ri Co Li Ro Ci Lo Ri Co Ti": "*The Hanover"
+              ,"Lo Ri Co Ri Lo Ci Ro Li Co Ti": "*The co-Hanover"
+              ,"Lo Ri Co Li Ro Ci Ro Li Co Ti": "*The co-Hanover 2"
+              ,"Lo Ri Co Ri Lo Ci Lo Ri Co Ti": "*The co-Hanover 3"
+              ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*The Balthus"
+              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*The co-Balthus"
     }
 def through():
     return Node('through', 'in')
@@ -93,9 +93,12 @@ def random_walk(walk=[]):
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
 
-def render_knot(list):
-    str_list = [str(node) for node in list]
-    knot_str = " ".join(str_list)
+def get_str(knot):
+    str_list = [str(node) for node in knot]
+    return " ".join(str_list)
+
+def render_knot(knot):
+    knot_str = get_str(knot)
     if knot_str in NAMED_KNOTS:
         name = NAMED_KNOTS[knot_str]
     else:
@@ -109,6 +112,14 @@ def produce_knot(num=1):
         if knot not in knots:
             knots.append(knot)
     return "\n".join(knots)
+
+def named_knot(num=1):
+    knots = []
+    while len(knots) < num:
+        knot = random_walk()
+        if get_str(knot) in NAMED_KNOTS and render_knot(knot) not in knots:
+            knots.append(render_knot(knot))
+    return knots
 
 
 class Node(object):
@@ -148,4 +159,4 @@ class Node(object):
 
 if __name__ == "__main__":
     print(produce_knot(25))
-
+    print(named_knot())
