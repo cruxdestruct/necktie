@@ -10,56 +10,118 @@ SHORTNAMES = {
     'in'     :'i',
     'through':'T'
 }
-KNOT_NAMES = ( "The Corinthian"
-              ,"The Englebert"
-              ,"The Rogue"
-              ,"The Wayne"
-              ,"The Alphonse"
-              ,"The Fancy Hacker"
-              ,"The Cornwallis"
-              ,"The Manifesto"
-              ,"The Broadway"
-              ,"The Ace of Spades"
-              ,"The Flying Fox"
-              ,"The Tally-Ho"
-              ,"The Royal Hangman"
-              ,"The Ritchie"
-              ,"The Lovelace"
-              ,"The Dijkstra"
-              ,"The Russell"
-              ,"The Hopper"
-              ,"The Church"
-              ,"The Babbge"
-              ,"The Turing"
-              ,"The Brimley"
-              ,"The Subtle -Ism"
-
+KNOT_NAMES = ( "Corinthian"
+              ,"Englebert"
+              ,"Rogue"
+              ,"Wayne"
+              ,"Alphonse"
+              ,"Fancy Hacker"
+              ,"Cornwallis"
+              ,"Manifesto"
+              ,"Broadway"
+              ,"Ace of Spades"
+              ,"Flying Fox"
+              ,"Tally-Ho"
+              ,"Royal Hangman"
+              ,"Ritchie"
+              ,"Lovelace"
+              ,"Dijkstra"
+              ,"Russell"
+              ,"Hopper"
+              ,"Church"
+              ,"Babbge"
+              ,"Turing"
+              ,"Brimley"
+              ,"Subtle -Ism"
+              ,"Mandalay"
+              ,"Afraid"
+              ,"Spaghetti"
+              ,"Alphine Butterfly"
+              ,"Carrick Bend"
+              ,"Anchor Hitch"
+              ,"Constrictor"
+              ,"Clove Hitch"
+              ,"Sheet Bend"
+              ,"Poacher's"
+              ,"Rat-tail Stopper"
+              ,"Halyard Hitch"
+              ,"Tubular"
+              ,"Fuzzy"
+              ,"DiGiorno's"
+              ,"Logan's"
+              ,"Knot"
+              ,"Louisville Fumble"
+              ,"Gordian"
+              ,"Garlic"
+              ,"Inferior Ascot"
+              ,"Naughty Crumpet"
+              ,"Flying Dutchman"
+              ,"Sir Knot Appearing in This Film"
+              ,"Prusik"
+              ,"Trucker's"
+              ,"Strange Loop"
+              ,"Mark and Sweep"
+              ,"Closed Cambridge"
+              ,"Bent Shepherd"
+              ,"Riker's Beard"
+              ,"Indirect Buffer"
+              ,"Auto Fill"
+              ,"Right Fringe"
+              ,"Meta Control"
+              ,"Copy Left"
+              ,"Kill and Yank"
+              ,"Mark Ring"
+              ,"Split Frame"
+              ,"Earl Grey, Hot"
+              ,"Stupid Big"
+              ,"Hanging Bunny"
+              ,"Wexler-Windkloppel"
+              ,"Trefoil"
+              ,"Garlic"
+              ,"Khwarizmi"
+              ,"Backus"
+              ,"Boole"
+              ,"Berners-Lee"
+              ,"Cerf"
+              ,"Engelbart"
+              ,"Flowers"
+              ,"Gödel"
+              ,"Frege"
+              ,"Wittgenstein"
+              ,"Knuth"
+              ,"Leibniz"
+              ,"Cantor"
+              ,"McCarthy"
+              ,"Minsky"
+              ,"von Neumann"
+              ,"Thompson"
+              ,"Curry"
     )
-NAMED_KNOTS = { "Lo Ri Co Ti": "*The Oriental"
-              ,"Li Ro Li Co Ti": "*The Four-in-Hand"
-              ,"Lo Ri Lo Ri Co Ti": "*The Kelvin"
-              ," Lo Ci Ro Li Co Ti": "*The Nicky"
-              ,"Lo Ci Lo Ri Co Ti": "*The Pratt aka The Shelby"
-              ,"Li Ro Li Ro Li Co Ti": "*The Victoria"
-              ,"Li Ro Ci Lo Ri Co Ti": "*The Half-Windsor"
-              ,"Li Ro Ci Ro Li Co Ti": "*The co-Half-Windsor"
-              ,"Lo Ri Lo Ci Ro Li Co Ti": "*The St. Andrew"
-              ,"Lo Ri Lo Ci Lo Ri Co Ti": "*The co-St. Andrew"
-              ,"Lo Ci Ro Ci Lo Ri Co Ti": "*The Plattsburgh"
-              ,"Lo Ci Ro Ci Ro Li Co Ti": "*The co-Plattsburgh"
-              ,"Li Ro Li Co Ri Lo Ri Co Ti": "*The Cavendish"
-              ,"Li Co Ri Lo Ci Ro Li Co Ti": "*The Windsor"
-              ,"Li Co Li Ro Ci Lo Ri Co Ti ": "*The co-Windsor"
-              ,"Li Co Ri Lo Ci Lo Ri Co Ti": "*The co-Winsdor 2"
-              ,"Li Co Li Ro Ci Ro Li Co Ti": "*The co-Windsor 3"
-              ,"Lo Ri Lo Ri Co Li Ro Li Co Ti": "*The Grantchester"
-              ,"Lo Ri Lo Ri Co Ri Lo Ri Co Ti": "*The co-Grantchester"
-              ,"Lo Ri Co Li Ro Ci Lo Ri Co Ti": "*The Hanover"
-              ,"Lo Ri Co Ri Lo Ci Ro Li Co Ti": "*The co-Hanover"
-              ,"Lo Ri Co Li Ro Ci Ro Li Co Ti": "*The co-Hanover 2"
-              ,"Lo Ri Co Ri Lo Ci Lo Ri Co Ti": "*The co-Hanover 3"
-              ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*The Balthus"
-              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*The co-Balthus"
+NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"#
+              ,"Li Ro Li Co Ti": "*Four-in-Hand"#
+              ,"Lo Ri Lo Ri Co Ti": "*Kelvin"#
+              ,"Lo Ci Ro Li Co Ti": "*Nicky"
+              ,"Lo Ci Lo Ri Co Ti": "*Pratt aka Shelby"#
+              ,"Li Ro Li Ro Li Co Ti": "*Victoria"#
+              ,"Li Ro Ci Lo Ri Co Ti": "*Half-Windsor"#
+              ,"Li Ro Ci Ro Li Co Ti": "*co-Half-Windsor"#
+              ,"Lo Ri Lo Ci Ro Li Co Ti": "*St. Andrew"#
+              ,"Lo Ri Lo Ci Lo Ri Co Ti": "*co-St. Andrew"#
+              ,"Lo Ci Ro Ci Lo Ri Co Ti": "*Plattsburgh"#
+              ,"Lo Ci Ro Ci Ro Li Co Ti": "*co-Plattsburgh"#
+              ,"Li Ro Li Co Ri Lo Ri Co Ti": "*Cavendish"#
+              ,"Li Co Ri Lo Ci Ro Li Co Ti": "*Windsor"#
+              ,"Li Co Li Ro Ci Lo Ri Co Ti": "*co-Windsor"
+              ,"Li Co Ri Lo Ci Lo Ri Co Ti": "*co-Windsor 2"#
+              ,"Li Co Li Ro Ci Ro Li Co Ti": "*co-Windsor 3"#
+              ,"Lo Ri Lo Ri Co Li Ro Li Co Ti": "*Grantchester"#
+              ,"Lo Ri Lo Ri Co Ri Lo Ri Co Ti": "*co-Grantchester"#
+              ,"Lo Ri Co Li Ro Ci Lo Ri Co Ti": "*Hanover"#
+              ,"Lo Ri Co Ri Lo Ci Ro Li Co Ti": "*co-Hanover"#
+              ,"Lo Ri Co Li Ro Ci Ro Li Co Ti": "*co-Hanover 2"#
+              ,"Lo Ri Co Ri Lo Ci Lo Ri Co Ti": "*co-Hanover 3"#
+              ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*Balthus"#
+              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"#
     }
 def through():
     return Node('through', 'in')
@@ -68,6 +130,7 @@ def starter():
     return Node('left', random.choice(['in', 'out']))
 
 def flip(value):
+    # 'Flip the bit' of the provided value, providing its alternate(s)
     if value in DIRECTIONS:
         return list(DIRECTIONS - set([value]))
     elif value in BITS:
@@ -80,7 +143,7 @@ def random_walk(walk=[]):
             return random_walk([starter()])
         elif walk[-1] == Node('Ti'):
             return walk
-        elif len(walk) > 10:
+        elif len(walk) > 9:
             walk.pop()
             while walk and walk[-1] != Node('Co'):
                 walk.pop()
@@ -92,20 +155,22 @@ def random_walk(walk=[]):
         else:
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
-
 def get_str(knot):
+    # Convert a list of nodes into a string
     str_list = [str(node) for node in knot]
     return " ".join(str_list)
 
 def render_knot(knot):
+    # Get a name from a string and return the named string
     knot_str = get_str(knot)
     if knot_str in NAMED_KNOTS:
         name = NAMED_KNOTS[knot_str]
     else:
         name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
-    return "{}: {}".format(name, knot_str)
+    return "The {}: {}".format(name, knot_str)
 
 def produce_knot(num=1):
+    # Get a name from a string and return the named string
     knots = []
     for i in range(num):
         knot = render_knot(random_walk())
@@ -114,10 +179,12 @@ def produce_knot(num=1):
     return "\n".join(knots)
 
 def named_knot(num=1):
+    # Get a name from a string and return the named string
     knots = []
-    while len(knots) < num:
+    while len(knots) < min(num, 25):
         knot = random_walk()
         if get_str(knot) in NAMED_KNOTS and render_knot(knot) not in knots:
+            print(render_knot(knot))
             knots.append(render_knot(knot))
     return knots
 
@@ -159,4 +226,4 @@ class Node(object):
 
 if __name__ == "__main__":
     print(produce_knot(25))
-    print(named_knot())
+    
