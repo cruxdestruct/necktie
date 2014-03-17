@@ -205,6 +205,7 @@ def analyze(knot):
             Size: 8
             Symmetry: -1
             Balance: 2
+            This knot will untie when pulled out.
     <BLANKLINE>
     """
     l_r = (sum(1 for node in knot if node.name == "left"),
@@ -215,12 +216,16 @@ def analyze(knot):
     symmetry = l_r[1] - l_r[0]
     wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
     balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
+    knotted = True
+    if knot[-4:] == [from_str("Ro Li Co Ti")]:
+        knotted = False
     print("""
         {render}
         Size: {size}
         Symmetry: {symmetry}
         Balance: {balance}
-        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance))
+        This knot {knotted} untie when pulled out.
+        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance, knotted=('will' if True else 'will not')))
   
 def tie_a_tie():
     # Interactive tie tying.
