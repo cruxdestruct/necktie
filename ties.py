@@ -208,18 +208,27 @@ def analyze(knot):
             Size: 8
             Symmetry: -1
             Balance: 2
-            This knot will untie when pulled out.
+            This is a rather broad knot.
+            This knot will not untie when pulled out.
     <BLANKLINE>
     """
     l_r = (sum(1 for node in knot if node.name == "left"),
               (sum(1 for node in knot if node.name == "right")))
     centers = sum(1 for node in knot if node.name == 'center')
     size = len(knot) - 1
-    breadth = float(centers) / size
+    breadth = centers / size
     symmetry = l_r[1] - l_r[0]
     wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
     balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
     knotted = True
+    if breadth < .25:
+        shape = "very narrow"
+    elif .25 <= breadth < .33:
+        shape = "rather narrow"
+    elif .33 <= breadth < .4:
+        shape = "rather broad"
+    elif .4 <= breadth:
+        shape = 'very broad'
     if knot[-4:] == [from_str("Ro Li Co Ti")]:
         knotted = False
     print("""
@@ -227,8 +236,9 @@ def analyze(knot):
         Size: {size}
         Symmetry: {symmetry}
         Balance: {balance}
+        This is a {shape} knot.
         This knot {knotted} untie when pulled out.
-        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
+        """.format(render=render(knot), size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
   
 def tie_a_tie():
     # Interactive tie tying.
@@ -236,9 +246,9 @@ def tie_a_tie():
     with term.location(0,0):
         print(term.clear())
         starting_point = input("Start in or out? ").lower()
-        if starting_point == "i" or "in":
+        if starting_point in ["i", "in"]:
             tie = [Node('Li')]
-        elif starting_point == "o" or "out":
+        elif starting_point in ["o", "out"]:
             tie = [Node('Lo')]
         else:
             tie = [starter()]
@@ -324,6 +334,6 @@ class Node(object):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    print(produce(25))
-    tie_a_tie()
+    # print(produce(25))
+    # tie_a_tie()
     
