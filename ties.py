@@ -1,5 +1,7 @@
 import random
 from itertools import tee
+from blessings import Terminal
+from time import sleep
 
 DIRECTIONS = {'left', 'right', 'center'}
 BITS = {'out', 'in'}
@@ -226,36 +228,56 @@ def analyze(knot):
         Symmetry: {symmetry}
         Balance: {balance}
         This knot {knotted} untie when pulled out.
-        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance, knotted=('will' if True else 'will not')))
+        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
   
 def tie_a_tie():
     # Interactive tie tying.
-    starting_point = input("Start in or out? ").lower()
-    if starting_point == "i" or "in":
-        tie = [Node('Li')]
-    elif starting_point == "o" or "out":
-        tie = [Node('Lo')]
-    else:
-        tie = [starter()]
-    while tie[-1] != Node('Ti'):
-        choices = get_str(tie[-1].get_children())
-        while True:
-            possibilities = []
-            for name in NAMED_KNOTS.keys():
-              if get_str(tie) == name[:len(get_str(tie))]:
-                possibilities.append(NAMED_KNOTS[name])
-            next = input("Possible knots:\n{}\nNext step ({}): ".format("\n".join(possibilities), choices))
-            try:
-                if next in choices:
-                    tie.append(Node(next))
+    term = Terminal()
+    with term.location(0,0):
+        print(term.clear())
+        starting_point = input("Start in or out? ").lower()
+        if starting_point == "i" or "in":
+            tie = [Node('Li')]
+        elif starting_point == "o" or "out":
+            tie = [Node('Lo')]
+        else:
+            tie = [starter()]
+        while tie[-1] != Node('Ti'):
+            print(term.clear())
+            choices = get_str(tie[-1].get_children())
+            tie_str = get_str(tie)
+            while True:
+                with term.location(0,3):
+                    possibilities = []
+                    for name in NAMED_KNOTS.keys():
+                        if tie_str == name[:len(tie_str)]:
+                            possibilities.append(NAMED_KNOTS[name])
+                    print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
+                next = input("Your knot so far: {}\nNext step ({}{}): ".format(tie_str, choices, 
+                                                                        " back" if len(tie) > 1 else ""))
+                if next == "back":
+                    tie.pop()
                     break
-                else: 
-                    print("Please enter a valid choice.")
-            except:
-                print("Please enter a valid choice.")
-                pass
-    
-
+                else:
+                    try:
+                        if next in choices:
+                            tie.append(Node(next))
+                            break
+                        else: 
+                            print(term.clear())
+                            with term.location(10, term.height):
+                                print("Please enter a valid choice.")
+                                sleep(1)
+                                print(term.clear())
+                                pass
+                    except:
+                        print(term.clear())
+                        with term.location(10, term.height):
+                            print("Please enter a valid choice.")
+                            sleep(1)
+                            print(term.clear())
+                            pass
+        print(term.clear())
     analyze(tie)
 
 
