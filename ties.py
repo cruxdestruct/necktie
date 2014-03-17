@@ -1,4 +1,5 @@
 import random
+from itertools import tee
 
 DIRECTIONS = {'left', 'right', 'center'}
 BITS = {'out', 'in'}
@@ -11,13 +12,10 @@ SHORTNAMES = {
     'through':'T'
 }
 KNOT_NAMES = ( "Corinthian"
-              ,"Englebert"
               ,"Rogue"
               ,"Wayne"
               ,"Alphonse"
               ,"Fancy Hacker"
-              ,"Cornwallis"
-              ,"Manifesto"
               ,"Broadway"
               ,"Ace of Spades"
               ,"Flying Fox"
@@ -138,6 +136,12 @@ def flip(value):
     else:
         return value
 
+def pairwise(iterable):
+    #stolen from SO
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
 def random_walk(walk=[]):
         if not walk:
             return random_walk([starter()])
@@ -155,12 +159,16 @@ def random_walk(walk=[]):
         else:
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
+def from_str(str):
+    words = str.split()
+    return [Node(word) for word in words]
+
 def get_str(knot):
     # Convert a list of nodes into a string
     str_list = [str(node) for node in knot]
     return " ".join(str_list)
 
-def render_knot(knot):
+def render(knot):
     # Get a name from a string and return the named string
     knot_str = get_str(knot)
     if knot_str in NAMED_KNOTS:
@@ -169,24 +177,77 @@ def render_knot(knot):
         name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
     return "The {}: {}".format(name, knot_str)
 
-def produce_knot(num=1):
+def produce(num=1):
     # Get a name from a string and return the named string
     knots = []
     for i in range(num):
-        knot = render_knot(random_walk())
+        knot = render(random_walk())
         if knot not in knots:
             knots.append(knot)
     return "\n".join(knots)
 
-def named_knot(num=1):
+def named(num=1):
     # Get a name from a string and return the named string
     knots = []
     while len(knots) < min(num, 25):
         knot = random_walk()
-        if get_str(knot) in NAMED_KNOTS and render_knot(knot) not in knots:
-            print(render_knot(knot))
-            knots.append(render_knot(knot))
+        if get_str(knot) in NAMED_KNOTS and render(knot) not in knots:
+            print(render(knot))
+            knots.append(render(knot))
     return knots
+
+def analyze(knot):
+    """
+    Report on Fink & Mao's metrics for a given knot.
+    >>> analyze(from_str("Li Co Li Ro Ci Ro Li Co Ti"))
+    <BLANKLINE>
+            The *co-Windsor 3: Li Co Li Ro Ci Ro Li Co Ti
+            Size: 8
+            Symmetry: -1
+            Balance: 2
+    <BLANKLINE>
+    """
+    l_r = (sum(1 for node in knot if node.name == "left"),
+              (sum(1 for node in knot if node.name == "right")))
+    centers = sum(1 for node in knot if node.name == 'center')
+    size = len(knot) - 1
+    breadth = float(centers) / size
+    symmetry = l_r[1] - l_r[0]
+    wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
+    balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
+    print("""
+        {render}
+        Size: {size}
+        Symmetry: {symmetry}
+        Balance: {balance}
+        """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance))
+  
+def tie_a_tie():
+    starting_point = input("Start in or out? ").lower()
+    if starting_point == "i" or "in":
+        tie = [Node('Li')]
+    elif starting_point == "o" or "out":
+        tie = [Node('Lo')]
+    else:
+        tie = [starter()]
+
+
+    while tie[-1] != Node('Ti'):
+        children = tie[-1].get_children()
+        choices = [str(child) for child in children]
+        while True:
+            next = input("Next step: {} ".format(choices))
+            try:
+                if Node(next) in children:
+                    tie.append(Node(next))
+                    break
+                else: 
+                    print("Please enter a valid choice.")
+            except:
+                print("Please enter a valid choice.")
+                pass
+
+    analyze(tie)
 
 
 class Node(object):
@@ -207,6 +268,8 @@ class Node(object):
                     self.name = key
                 if self.shortname[1] == value:
                     self.bit = key
+        if not (self.shortname and self.bit and self.name):
+            raise AttributeError('Bad node created.')
 
     def __repr__(self):
         return "node {}.{}".format(self.name, self.bit)
@@ -217,6 +280,9 @@ class Node(object):
     def __eq__(self, other):
         return self.shortname == other.shortname
 
+    def __gt__(self, other):
+        return (self.name == 'left' and other.name == 'right') or (self.name == 'right' and other.name == 'center') or (self.name == 'center' and other.name == 'left')
+
     def get_children(self):
         choices = flip(self.name)
         children = [Node(choices[0], flip(self.bit)), Node(choices[1], flip(self.bit))]
@@ -225,5 +291,8 @@ class Node(object):
         return children
 
 if __name__ == "__main__":
-    print(produce_knot(25))
+    import doctest
+    doctest.testmod()
+    print(produce(25))
+    tie_a_tie()
     
