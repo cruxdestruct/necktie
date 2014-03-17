@@ -142,23 +142,6 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
-def random_walk(walk=[]):
-        if not walk:
-            return random_walk([starter()])
-        elif walk[-1] == Node('Ti'):
-            return walk
-        elif len(walk) > 9:
-            walk.pop()
-            while walk and walk[-1] != Node('Co'):
-                walk.pop()
-            if not walk:
-                walk = random_walk(walk)
-            else:
-                walk.append(through())
-            return walk 
-        else:
-            walk.append(random.choice(walk[-1].get_children()))
-            return random_walk(walk)
 def from_str(str):
     words = str.split()
     return [Node(word) for word in words]
@@ -177,6 +160,24 @@ def render(knot):
         name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
     return "The {}: {}".format(name, knot_str)
 
+def random_walk(walk=[]):
+        if not walk:
+            return random_walk([starter()])
+        elif walk[-1] == Node('Ti'):
+            return walk
+        elif len(walk) > 9:
+            walk.pop()
+            while walk and walk[-1] != Node('Co'):
+                walk.pop()
+            if not walk:
+                walk = random_walk(walk)
+            else:
+                walk.append(through())
+            return walk 
+        else:
+            walk.append(random.choice(walk[-1].get_children()))
+            return random_walk(walk)
+            
 def produce(num=1):
     # Generate n random unique knots
     knots = []
@@ -236,15 +237,16 @@ def tie_a_tie():
         tie = [Node('Lo')]
     else:
         tie = [starter()]
-
-
     while tie[-1] != Node('Ti'):
-        children = tie[-1].get_children()
-        choices = [str(child) for child in children]
+        choices = get_str(tie[-1].get_children())
         while True:
-            next = input("Next step: {} ".format(choices))
+            possibilities = []
+            for name in NAMED_KNOTS.keys():
+              if get_str(tie) == name[:len(get_str(tie))]:
+                possibilities.append(NAMED_KNOTS[name])
+            next = input("Possible knots:\n{}\nNext step ({}): ".format("\n".join(possibilities), choices))
             try:
-                if Node(next) in children:
+                if next in choices:
                     tie.append(Node(next))
                     break
                 else: 
@@ -252,6 +254,8 @@ def tie_a_tie():
             except:
                 print("Please enter a valid choice.")
                 pass
+    
+
     analyze(tie)
 
 
