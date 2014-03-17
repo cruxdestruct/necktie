@@ -178,7 +178,7 @@ def render(knot):
     return "The {}: {}".format(name, knot_str)
 
 def produce(num=1):
-    # Get a name from a string and return the named string
+    # Generate n random unique knots
     knots = []
     for i in range(num):
         knot = render(random_walk())
@@ -187,7 +187,7 @@ def produce(num=1):
     return "\n".join(knots)
 
 def named(num=1):
-    # Get a name from a string and return the named string
+    # Produce n unique named knots
     knots = []
     while len(knots) < min(num, 25):
         knot = random_walk()
@@ -223,6 +223,7 @@ def analyze(knot):
         """.format(render=render(knot), size=size, symmetry=symmetry, balance=balance))
   
 def tie_a_tie():
+    # Interactive tie tying.
     starting_point = input("Start in or out? ").lower()
     if starting_point == "i" or "in":
         tie = [Node('Li')]
@@ -246,7 +247,6 @@ def tie_a_tie():
             except:
                 print("Please enter a valid choice.")
                 pass
-
     analyze(tie)
 
 
