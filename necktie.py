@@ -209,8 +209,8 @@ def analyze(knot):
             Symmetry: -1
             Balance: 2
             This is a rather broad knot.
-            This knot will untie when pulled out.
             You will not have trouble tying this knot.
+            This knot will untie when pulled out.
     <BLANKLINE>
     """
     l_r = (sum(1 for node in knot if node.name == "left"),
@@ -242,8 +242,8 @@ def analyze(knot):
         Symmetry: {symmetry}
         Balance: {balance}
         This is a {shape} knot.
-        This knot {knotted} untie when pulled out.
         You {tiable} have trouble tying this knot.
+        This knot {knotted} untie when pulled out.
         """.format(render=render(knot), tiable=('will probably' if not tiable else 'will not'), size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
   
 def tie_a_tie():
