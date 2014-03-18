@@ -209,7 +209,8 @@ def analyze(knot):
             Symmetry: -1
             Balance: 2
             This is a rather broad knot.
-            This knot will not untie when pulled out.
+            This knot will untie when pulled out.
+            You will not have trouble tying this knot.
     <BLANKLINE>
     """
     l_r = (sum(1 for node in knot if node.name == "left"),
@@ -221,6 +222,7 @@ def analyze(knot):
     wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
     balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
     knotted = True
+    tiable = False
     if breadth < .25:
         shape = "very narrow"
     elif .25 <= breadth < .33:
@@ -229,8 +231,11 @@ def analyze(knot):
         shape = "rather broad"
     elif .4 <= breadth:
         shape = 'very broad'
-    if knot[-4:] == [from_str("Ro Li Co Ti")]:
+    if knot[-4:] == from_str("Ro Li Co Ti"):
         knotted = False
+    if knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti")):
+        tiable = True
+
     print("""
         {render}
         Size: {size}
@@ -238,7 +243,8 @@ def analyze(knot):
         Balance: {balance}
         This is a {shape} knot.
         This knot {knotted} untie when pulled out.
-        """.format(render=render(knot), size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
+        You {tiable} have trouble tying this knot.
+        """.format(render=render(knot), tiable=('will probably' if not tiable else 'will not'), size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
   
 def tie_a_tie():
     # Interactive tie tying.
