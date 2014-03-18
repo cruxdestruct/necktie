@@ -7,7 +7,7 @@ This python library is an exploration of the concepts introduced in [*The 85 Way
 
 It currently is able to randomly design necktie knots, and allows the user to design necktie knots, using their system of notation. It can apply the metrics introduced in the above papers to a given knot to analyze its aesthetics. If the knot is not an established knot or one of the knots introduced in the book, it is assigned one of a number of new necktie knot names suggested by many of the members of [Hacker School](http://hackerschool.com)[^1]
 
-[^1]: Thanks to Jay Weisskopf, Dan Wuu, Riley Shaw, Mindy Preston, Amy Hanlon, Rose Ames, Robert Lord, Zach Allaun, Andrea Fey, Lindsay Kuper, Pablo Torres, Alex Whitney, Sumana Harihareswara, Matthew Long, Will Sommers.
+[^1]: Thanks to Jay Weisskopf, Dan Wuu, Riley Shaw, Mindy Preston, Amy Hanlon, Rose Ames, Robert Lord, Zach Allaun, Andrea Fey, Lindsay Kuper, Pablo Torres, Alex Whitney, Sumana Harihareswara, Matthew Long, Will Sommers, Carl Vogel.
 
 ``` .py
 >>> analyze(random_walk())
