@@ -341,4 +341,4 @@ if __name__ == "__main__":
     doctest.testmod()
     # print(produce(85))
     # tie_a_tie()
-    
+    analyze(random_walk()) 
