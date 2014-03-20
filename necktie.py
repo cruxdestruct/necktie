@@ -165,6 +165,9 @@ def render(knot):
         name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
     return "The {}: {}".format(name, knot_str)
 
+def tiable(knot):
+    return knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti"))
+
 def random_walk(walk=[]):
         if not walk:
             return random_walk([starter()])
@@ -172,7 +175,7 @@ def random_walk(walk=[]):
             return walk
         elif len(walk) > 9:
             walk.pop()
-            while walk and walk[-1] != Node('Co'):
+            while walk and not tiable(walk):
                 walk.pop()
             if not walk:
                 walk = random_walk(walk)
@@ -185,21 +188,19 @@ def random_walk(walk=[]):
             
 def produce(num=1):
     # Generate n random unique knots
-    knots = []
-    for i in range(num):
-        knot = render(random_walk())
-        if knot not in knots:
-            knots.append(knot)
-    return "\n".join(knots)
+    knots = set([])
+    while len(knots) < num:
+        knots.add(get_str(random_walk()))
+    return "\n".join(sorted(list(knots)))
 
 def named(num=1):
     # Produce n unique named knots
-    knots = []
+    knots = set([])
     while len(knots) < min(num, 25):
-        knot = random_walk()
-        if get_str(knot) in NAMED_KNOTS and render(knot) not in knots:
-            print(render(knot))
-            knots.append(render(knot))
+        knot = get_str(random_walk())
+        if knot in NAMED_KNOTS and knot not in knots:
+            print(knot)
+            knots.add(get_str(knot))
     return knots
 
 def analyze(knot):
@@ -212,7 +213,6 @@ def analyze(knot):
             Symmetry: -1
             Balance: 2
             This is a rather broad knot.
-            You will not have trouble tying this knot.
             This knot will untie when pulled out.
     <BLANKLINE>
     """
@@ -225,7 +225,6 @@ def analyze(knot):
     wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
     balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
     knotted = True
-    tiable = False
     if breadth < .25:
         shape = "very narrow"
     elif .25 <= breadth < .33:
@@ -236,18 +235,15 @@ def analyze(knot):
         shape = 'very broad'
     if knot[-4:] == from_str("Ro Li Co Ti"):
         knotted = False
-    if knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti")):
-        tiable = True
-
+    
     print("""
         {render}
         Size: {size}
         Symmetry: {symmetry}
         Balance: {balance}
         This is a {shape} knot.
-        You {tiable} have trouble tying this knot.
         This knot {knotted} untie when pulled out.
-        """.format(render=render(knot), tiable=('will probably' if not tiable else 'will not'), size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
+        """.format(render=render(knot),size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
   
 def tie_a_tie():
     # Interactive tie tying.
@@ -343,6 +339,6 @@ class Node(object):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    # print(produce(25))
+    # print(produce(85))
     # tie_a_tie()
     
