@@ -1,3 +1,6 @@
+#!/usr/bin/python3 
+# -*- coding: utf-8 -*-
+
 import random
 from itertools import tee
 from blessings import Terminal
