@@ -244,7 +244,7 @@ def produce(num=1):
     # Generate n random unique knots
     knots = set([])
     while len(knots) < num:
-        knots.add(get_str(linear_build()))
+        knots.add(get_str(random_walk()))
     return "\n".join(sorted(list(knots)))
 
 def named(num=1):
