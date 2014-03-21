@@ -171,17 +171,12 @@ def tiable(knot):
 def random_walk(walk=[]):
         if not walk:
             return random_walk([starter()])
-        elif walk[-1] == Node('Ti'):
+        elif walk[-1] == Node('Ti') and tiable(walk):
             return walk
+        elif walk[-1] == Node('Ti') and not tiable(walk):
+            return random_walk(walk[:-4])
         elif len(walk) > 9:
-            walk.pop()
-            while walk and not tiable(walk):
-                walk.pop()
-            if not walk:
-                walk = random_walk(walk)
-            else:
-                walk.append(through())
-            return walk 
+            return random_walk(walk[:-4])
         else:
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
@@ -341,4 +336,5 @@ if __name__ == "__main__":
     doctest.testmod()
     # print(produce(85))
     # tie_a_tie()
-    analyze(random_walk()) 
+    import cProfile
+    cProfile.run('produce(85)')
