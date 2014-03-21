@@ -6,15 +6,15 @@ from itertools import tee
 from blessings import Terminal
 from time import sleep
 
-DIRECTIONS = {'left', 'right', 'center'}
-BITS = {'out', 'in'}
+DIRECTIONS = {'L', 'R', 'C'}
+BITS = {"o", "i"}
 SHORTNAMES = {
-    'left'   :'L',
-    'right'  :'R',
-    'center' :'C',
-    'out'    :'o',
-    'in'     :'i',
-    'through':'T'
+    'L'   :'L',
+    "R"  :'R',
+    "C" :'C',
+    "o"    :'o',
+    "i"     :'i',
+    "T":'T'
 }
 KNOT_NAMES = ( "Corinthian"
               ,"Rogue"
@@ -127,10 +127,10 @@ NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"#
               ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"#
     }
 def through():
-    return Node('through', 'in')
+    return Node('T', 'i')
 
 def starter():
-    return Node('left', random.choice(['in', 'out']))
+    return Node('L', random.choice(['i', 'o']))
 
 def flip(value):
     # 'Flip the bit' of the provided value, providing its alternate(s)
@@ -147,6 +147,53 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+def finishable(knot):
+    return knot[-3:] in (from_str("Ro Li Co"), from_str("Lo Ri Co"))
+
+def penultimate(knot):
+    return len(knot) == 8 and knot[0].shortname == "Lo" or len(knot) == 7 and knot[0].shortname == 'Li'
+
+def antepenultimate(knot):
+    return len(knot) == 7 and knot[0].shortname == "Lo" or len(knot) == 6 and knot[0].shortname == 'Li'
+
+def preantepenultimate(knot):
+    return len(knot) == 6 and knot[0].shortname == "Lo" or len(knot) == 5 and knot[0].shortname == 'Li'
+
+def mid_knot(knot):
+    return ((1 <= len(knot) < 6) and knot[0].shortname == "Lo") or ((1 <= len(knot) < 5) and knot[0].shortname == 'Li')
+
+def legal_moves(knot):
+    """
+    Get legal moves in a given position in a knot.
+    >>> legal_moves(from_str("Li"))
+    {'Ro', 'Ri', 'Lo', 'Li', 'Co', 'Ci'}
+    """
+    legal_moves = set([])
+    # import pdb
+    # pdb.set_trace()
+    if penultimate(knot):
+        legal_moves.update(['Co'])
+    elif antepenultimate(knot):
+        legal_moves.update(['Li', 'Ri'])
+    elif preantepenultimate(knot):
+        legal_moves.update(['Ro', 'Lo'])
+    elif mid_knot(knot):
+        legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
+    if finishable(knot):
+        legal_moves.update(['Ti'])
+    return legal_moves
+
+def linear_build():
+    knot = [starter()]
+    while True:
+        print("knot is", get_str(knot))
+        print("children are", knot[-1].get_children())
+        print("legal moves are", legal_moves(knot))
+        print("Intersection is", knot[-1].get_children() & legal_moves(knot))
+        knot.extend(from_str(random.choice(list(knot[-1].get_children() & legal_moves(knot)))))
+        if knot[-1].shortname == "Ti":
+            return knot
+    
 def from_str(str):
     words = str.split()
     return [Node(word) for word in words]
@@ -167,10 +214,6 @@ def render(knot):
 
 def tiable(knot):
     return knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti"))
-
-def finishable(knot):
-    return knot[-3:] in (from_str("Ro Li Co"), from_str("Lo Ri Co"))
-
 
 def random_walk(walk=[]):
         # print ("walk is ", get_str(walk))
@@ -226,9 +269,9 @@ def analyze(knot):
             This knot will untie when pulled out.
     <BLANKLINE>
     """
-    l_r = (sum(1 for node in knot if node.name == "left"),
-              (sum(1 for node in knot if node.name == "right")))
-    centers = sum(1 for node in knot if node.name == 'center')
+    l_r = (sum(1 for node in knot if node.name == "L"),
+              (sum(1 for node in knot if node.name == "R")))
+    centers = sum(1 for node in knot if node.name == "C")
     size = len(knot) - 1
     breadth = centers / size
     symmetry = l_r[1] - l_r[0]
@@ -261,9 +304,9 @@ def tie_a_tie():
     with term.location(0,0):
         print(term.clear())
         starting_point = input("Start in or out? ").lower()
-        if starting_point in ["i", "in"]:
+        if starting_point in ["i", "i"]:
             tie = [Node('Li')]
-        elif starting_point in ["o", "out"]:
+        elif starting_point in ["o", "o"]:
             tie = [Node('Lo')]
         else:
             tie = [starter()]
@@ -337,20 +380,23 @@ class Node(object):
         return self.shortname == other.shortname
 
     def __gt__(self, other):
-        return (self.name == 'left' and other.name == 'right') or (self.name == 'right' and other.name == 'center') or (self.name == 'center' and other.name == 'left')
+        return (self.name == "L" and other.name == "R") or (self.name == "R" and other.name == "C") or (self.name == "C" and other.name == "L")
 
     def get_children(self):
         choices = flip(self.name)
-        children = [Node(choices[0], flip(self.bit)), Node(choices[1], flip(self.bit))]
+        children = set([choices[0]+flip(self.bit), choices[1]+flip(self.bit)])
         if self.shortname == "Co":
-            children.append(Node('through','in'))
+            children.add('Ti')
+        elif self.shortname == "Ti":
+            children = set([])
         return children
 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
     # print(produce(85))
     # tie_a_tie()
-    import cProfile
-    cProfile.run('produce(85)')
+    # import cProfile
+    # cProfile.run('produce(85)')
     # print(produce(85))
