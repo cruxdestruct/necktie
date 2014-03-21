@@ -168,15 +168,30 @@ def render(knot):
 def tiable(knot):
     return knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti"))
 
+def finishable(knot):
+    return knot[-3:] in (from_str("Ro Li Co"), from_str("Lo Ri Co"))
+
+
 def random_walk(walk=[]):
+        # print ("walk is ", get_str(walk))
         if not walk:
             return random_walk([starter()])
-        elif walk[-1] == Node('Ti') and tiable(walk):
+        elif walk[-1].shortname == 'Ti' and tiable(walk):
             return walk
-        elif walk[-1] == Node('Ti') and not tiable(walk):
+        elif walk[-1].shortname == 'Ti' and not tiable(walk):
             return random_walk(walk[:-4])
-        elif len(walk) > 9:
-            return random_walk(walk[:-4])
+        elif len(walk) >= 9:
+            if walk[-1].shortname == 'Co':
+                if finishable(walk):
+                    walk.append(Node('Ti'))
+                    return walk
+                else:
+                    return random_walk(walk[:-1])
+            # if walk[-1].shortname == 'Co':
+            #     walk.append(Node('Ti'))
+                return random_walk(walk)
+            else:
+                return random_walk(walk[:-3])
         else:
             walk.append(random.choice(walk[-1].get_children()))
             return random_walk(walk)
@@ -327,7 +342,7 @@ class Node(object):
     def get_children(self):
         choices = flip(self.name)
         children = [Node(choices[0], flip(self.bit)), Node(choices[1], flip(self.bit))]
-        if self == Node("Co"):
+        if self.shortname == "Co":
             children.append(Node('through','in'))
         return children
 
@@ -338,3 +353,4 @@ if __name__ == "__main__":
     # tie_a_tie()
     import cProfile
     cProfile.run('produce(85)')
+    # print(produce(85))
