@@ -184,12 +184,13 @@ def legal_moves(knot):
     return legal_moves
 
 def linear_build():
+    # TODO : this only produces 69 knots.
     knot = [starter()]
     while True:
-        print("knot is", get_str(knot))
-        print("children are", knot[-1].get_children())
-        print("legal moves are", legal_moves(knot))
-        print("Intersection is", knot[-1].get_children() & legal_moves(knot))
+        # print("knot is", get_str(knot))
+        # print("children are", knot[-1].get_children())
+        # print("legal moves are", legal_moves(knot))
+        # print("Intersection is", knot[-1].get_children() & legal_moves(knot))
         knot.extend(from_str(random.choice(list(knot[-1].get_children() & legal_moves(knot)))))
         if knot[-1].shortname == "Ti":
             return knot
@@ -243,7 +244,7 @@ def produce(num=1):
     # Generate n random unique knots
     knots = set([])
     while len(knots) < num:
-        knots.add(get_str(random_walk()))
+        knots.add(get_str(linear_build()))
     return "\n".join(sorted(list(knots)))
 
 def named(num=1):
