@@ -100,31 +100,31 @@ KNOT_NAMES = ( "Corinthian"
               ,"Thompson"
               ,"Curry"
     )
-NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"#
-              ,"Li Ro Li Co Ti": "*Four-in-Hand"#
-              ,"Lo Ri Lo Ri Co Ti": "*Kelvin"#
+NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"
+              ,"Li Ro Li Co Ti": "*Four-in-Hand"
+              ,"Lo Ri Lo Ri Co Ti": "*Kelvin"
               ,"Lo Ci Ro Li Co Ti": "*Nicky"
-              ,"Lo Ci Lo Ri Co Ti": "*Pratt aka Shelby"#
-              ,"Li Ro Li Ro Li Co Ti": "*Victoria"#
-              ,"Li Ro Ci Lo Ri Co Ti": "*Half-Windsor"#
-              ,"Li Ro Ci Ro Li Co Ti": "*co-Half-Windsor"#
-              ,"Lo Ri Lo Ci Ro Li Co Ti": "*St. Andrew"#
-              ,"Lo Ri Lo Ci Lo Ri Co Ti": "*co-St. Andrew"#
-              ,"Lo Ci Ro Ci Lo Ri Co Ti": "*Plattsburgh"#
-              ,"Lo Ci Ro Ci Ro Li Co Ti": "*co-Plattsburgh"#
-              ,"Li Ro Li Co Ri Lo Ri Co Ti": "*Cavendish"#
-              ,"Li Co Ri Lo Ci Ro Li Co Ti": "*Windsor"#
+              ,"Lo Ci Lo Ri Co Ti": "*Pratt aka Shelby"
+              ,"Li Ro Li Ro Li Co Ti": "*Victoria"
+              ,"Li Ro Ci Lo Ri Co Ti": "*Half-Windsor"
+              ,"Li Ro Ci Ro Li Co Ti": "*co-Half-Windsor"
+              ,"Lo Ri Lo Ci Ro Li Co Ti": "*St. Andrew"
+              ,"Lo Ri Lo Ci Lo Ri Co Ti": "*co-St. Andrew"
+              ,"Lo Ci Ro Ci Lo Ri Co Ti": "*Plattsburgh"
+              ,"Lo Ci Ro Ci Ro Li Co Ti": "*co-Plattsburgh"
+              ,"Li Ro Li Co Ri Lo Ri Co Ti": "*Cavendish"
+              ,"Li Co Ri Lo Ci Ro Li Co Ti": "*Windsor"
               ,"Li Co Li Ro Ci Lo Ri Co Ti": "*co-Windsor"
-              ,"Li Co Ri Lo Ci Lo Ri Co Ti": "*co-Windsor 2"#
-              ,"Li Co Li Ro Ci Ro Li Co Ti": "*co-Windsor 3"#
-              ,"Lo Ri Lo Ri Co Li Ro Li Co Ti": "*Grantchester"#
-              ,"Lo Ri Lo Ri Co Ri Lo Ri Co Ti": "*co-Grantchester"#
-              ,"Lo Ri Co Li Ro Ci Lo Ri Co Ti": "*Hanover"#
-              ,"Lo Ri Co Ri Lo Ci Ro Li Co Ti": "*co-Hanover"#
-              ,"Lo Ri Co Li Ro Ci Ro Li Co Ti": "*co-Hanover 2"#
-              ,"Lo Ri Co Ri Lo Ci Lo Ri Co Ti": "*co-Hanover 3"#
-              ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*Balthus"#
-              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"#
+              ,"Li Co Ri Lo Ci Lo Ri Co Ti": "*co-Windsor 2"
+              ,"Li Co Li Ro Ci Ro Li Co Ti": "*co-Windsor 3"
+              ,"Lo Ri Lo Ri Co Li Ro Li Co Ti": "*Grantchester"
+              ,"Lo Ri Lo Ri Co Ri Lo Ri Co Ti": "*co-Grantchester"
+              ,"Lo Ri Co Li Ro Ci Lo Ri Co Ti": "*Hanover"
+              ,"Lo Ri Co Ri Lo Ci Ro Li Co Ti": "*co-Hanover"
+              ,"Lo Ri Co Li Ro Ci Ro Li Co Ti": "*co-Hanover 2"
+              ,"Lo Ri Co Ri Lo Ci Lo Ri Co Ti": "*co-Hanover 3"
+              ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*Balthus"
+              ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"
     }
 def through():
     return Node('T', 'i')
@@ -179,8 +179,6 @@ def legal_moves(knot):
 
     """
     legal_moves = set([])
-    # import pdb
-    # pdb.set_trace()
     if penultimate(knot):
         legal_moves.update(['Co'])
     elif antepenultimate(knot) and not finishable(knot):
@@ -201,7 +199,7 @@ def legal_intersection(knot):
     return list(knot[-1].get_children() & legal_moves(knot))
 
 def one_step(knot):
-    knot.extend(from_str(random.choice(legal_intersection(knot))))
+    knot.append(Node(random.choice(legal_intersection(knot))))
 
 def linear_build():
     knot = [starter()]
@@ -257,7 +255,7 @@ def random_walk(walk=[]):
             else:
                 return random_walk(walk[:-3])
         else:
-            walk.append(random.choice(walk[-1].get_children()))
+            walk.append(Node(random.choice(list(walk[-1].get_children()))))
             return random_walk(walk)
             
 def produce(num=1):
