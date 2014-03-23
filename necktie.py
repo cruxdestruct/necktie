@@ -148,7 +148,10 @@ def pairwise(iterable):
     return zip(a, b)
 
 def finishable(knot):
-    return knot[-3:] in (from_str("Ro Li Co"), from_str("Lo Ri Co"))
+    return get_str(knot[-3:]) in ("Ro Li Co", "Lo Ri Co")
+
+def two_away(knot):
+    return get_str(knot[-2:]) in ("Ro Li", "Lo Ri")
 
 def penultimate(knot):
     return len(knot) == 8 and knot[0].shortname == "Lo" or len(knot) == 7 and knot[0].shortname == 'Li'
@@ -165,33 +168,50 @@ def mid_knot(knot):
 def legal_moves(knot):
     """
     Get legal moves in a given position in a knot.
-    >>> legal_moves(from_str("Li"))
-    {'Ro', 'Ri', 'Lo', 'Li', 'Co', 'Ci'}
+    >>> sorted(list(legal_intersection(from_str("Li"))))
+    ['Co', 'Ro']
+    >>> sorted(list(legal_intersection(from_str("Lo Ri Co Ri Lo Ri Co"))))
+    ['Ti']
+    >>> sorted(list(legal_intersection(from_str("Lo Ri Co"))))
+    ['Li', 'Ri', 'Ti']
+    >>> sorted(list(legal_intersection(from_str("Lo"))))
+    ['Ci', 'Ri']
+
     """
     legal_moves = set([])
     # import pdb
     # pdb.set_trace()
     if penultimate(knot):
         legal_moves.update(['Co'])
-    elif antepenultimate(knot):
+    elif antepenultimate(knot) and not finishable(knot):
         legal_moves.update(['Li', 'Ri'])
-    elif preantepenultimate(knot):
+        if two_away(knot):
+            legal_moves.update(['Co'])
+    elif preantepenultimate(knot) and not finishable(knot):
         legal_moves.update(['Ro', 'Lo'])
+        if two_away(knot):
+            legal_moves.update(['Co'])
     elif mid_knot(knot):
         legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
     if finishable(knot):
         legal_moves.update(['Ti'])
     return legal_moves
 
+def legal_intersection(knot):
+    return list(knot[-1].get_children() & legal_moves(knot))
+
+def one_step(knot):
+    knot.extend(from_str(random.choice(legal_intersection(knot))))
+
 def linear_build():
-    # TODO : this only produces 69 knots.
     knot = [starter()]
     while True:
+        # print('*' * 10)
         # print("knot is", get_str(knot))
         # print("children are", knot[-1].get_children())
         # print("legal moves are", legal_moves(knot))
         # print("Intersection is", knot[-1].get_children() & legal_moves(knot))
-        knot.extend(from_str(random.choice(list(knot[-1].get_children() & legal_moves(knot)))))
+        one_step(knot)
         if knot[-1].shortname == "Ti":
             return knot
     
@@ -244,7 +264,7 @@ def produce(num=1):
     # Generate n random unique knots
     knots = set([])
     while len(knots) < num:
-        knots.add(get_str(random_walk()))
+        knots.add(get_str(linear_build()))
     return "\n".join(sorted(list(knots)))
 
 def named(num=1):
@@ -398,6 +418,6 @@ if __name__ == "__main__":
 
     # print(produce(85))
     # tie_a_tie()
-    # import cProfile
-    # cProfile.run('produce(85)')
+    import cProfile
+    cProfile.run('produce(85)')
     # print(produce(85))
