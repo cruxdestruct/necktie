@@ -8,14 +8,6 @@ from time import sleep
 
 DIRECTIONS = {'L', 'R', 'C'}
 BITS = {"o", "i"}
-SHORTNAMES = {
-    'L'   :'L',
-    "R"  :'R',
-    "C" :'C',
-    "o"    :'o',
-    "i"     :'i',
-    "T":'T'
-}
 KNOT_NAMES = ( "Corinthian"
               ,"Rogue"
               ,"Wayne"
@@ -365,17 +357,14 @@ class Node(object):
     """
     def __init__(self, *args):
         try:
-            dir, bit = args
-            self.direction = dir
+            direction, bit = args
+            self.direction = direction
             self.bit = bit
-            self.shortname = "{}{}".format(SHORTNAMES[self.direction], SHORTNAMES[self.bit])
+            self.shortname = "{}{}".format(self.direction, self.bit)
         except ValueError:
-            self.shortname = args[0]
-            for key, value in SHORTNAMES.items():
-                if self.shortname[0] == value:
-                    self.direction = key
-                if self.shortname[1] == value:
-                    self.bit = key
+            self.shortname = args[0].title()
+            self.direction = self.shortname[0]
+            self.bit = self.shortname[1]
         if not (self.shortname and self.bit and self.direction):
             raise AttributeError('Bad node created.')
 
@@ -386,7 +375,7 @@ class Node(object):
         return self.shortname
 
     def __eq__(self, other):
-        return self.shortname == other.shortname
+        return other.__eq__(self.shortname)
 
     def __gt__(self, other):
         return (self.direction == "L" and other.direction == "R") or (self.direction == "R" and other.direction == "C") or (self.direction == "C" and other.direction == "L")
@@ -485,6 +474,6 @@ if __name__ == "__main__":
 
     # print(produce(85))
     # tie_a_tie()
-    # import cProfile
-    # cProfile.run('produce(85)')
+    import cProfile
+    cProfile.run('produce(85)')
     # print(produce(85))
