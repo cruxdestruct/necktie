@@ -147,208 +147,320 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
-def finishable(knot):
-    return get_str(knot[-3:]) in ("Ro Li Co", "Lo Ri Co")
-
-def two_away(knot):
-    return get_str(knot[-2:]) in ("Ro Li", "Lo Ri")
-
-def penultimate(knot):
-    return len(knot) == 8 and knot[0].shortname == "Lo" or len(knot) == 7 and knot[0].shortname == 'Li'
-
-def antepenultimate(knot):
-    return len(knot) == 7 and knot[0].shortname == "Lo" or len(knot) == 6 and knot[0].shortname == 'Li'
-
-def preantepenultimate(knot):
-    return len(knot) == 6 and knot[0].shortname == "Lo" or len(knot) == 5 and knot[0].shortname == 'Li'
-
-def mid_knot(knot):
-    return ((1 <= len(knot) < 6) and knot[0].shortname == "Lo") or ((1 <= len(knot) < 5) and knot[0].shortname == 'Li')
-
-def legal_moves(knot):
+class Knot(object):
     """
-    Get legal moves in a given position in a knot.
-    >>> sorted(list(legal_intersection(from_str("Li"))))
-    ['Co', 'Ro']
-    >>> sorted(list(legal_intersection(from_str("Lo Ri Co Ri Lo Ri Co"))))
-    ['Ti']
-    >>> sorted(list(legal_intersection(from_str("Lo Ri Co"))))
-    ['Li', 'Ri', 'Ti']
-    >>> sorted(list(legal_intersection(from_str("Lo"))))
-    ['Ci', 'Ri']
-
+    >>> len(Knot())
+    1
+    >>> len(Knot("Li Ro"))
+    2
     """
-    legal_moves = set([])
-    if penultimate(knot):
-        legal_moves.update(['Co'])
-    elif antepenultimate(knot) and not finishable(knot):
-        legal_moves.update(['Li', 'Ri'])
-        if two_away(knot):
-            legal_moves.update(['Co'])
-    elif preantepenultimate(knot) and not finishable(knot):
-        legal_moves.update(['Ro', 'Lo'])
-        if two_away(knot):
-            legal_moves.update(['Co'])
-    elif mid_knot(knot):
-        legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
-    if finishable(knot):
-        legal_moves.update(['Ti'])
-    return legal_moves
 
-def legal_intersection(knot):
-    return list(knot[-1].get_children() & legal_moves(knot))
+    def __init__(self, value=None):
+        if not value:
+            self.sequence = [starter()]
+        else:
+            if isinstance(value, list):
+                self.sequence = value
+            elif isinstance(value, str):
+                self.sequence = [Node(word) for word in value.split()]
 
-def one_step(knot):
-    knot.append(Node(random.choice(legal_intersection(knot))))
+    def __getitem__(self, key):
+        """
+        Dictionary-style access for knots.
+        >>> print(Knot("Lo Ci")[-1])
+        Ci
+        """
+        return self.sequence[key]
 
-def linear_build():
-    knot = [starter()]
-    while True:
-        # print('*' * 10)
-        # print("knot is", get_str(knot))
-        # print("children are", knot[-1].get_children())
-        # print("legal moves are", legal_moves(knot))
-        # print("Intersection is", knot[-1].get_children() & legal_moves(knot))
-        one_step(knot)
-        if knot[-1].shortname == "Ti":
-            return knot
-    
-def from_str(str):
-    words = str.split()
-    return [Node(word) for word in words]
+    def __str__(self):
+        # Convert a list of nodes into a string
+        return " ".join([str(node) for node in self])
 
-def get_str(knot):
-    # Convert a list of nodes into a string
-    str_list = [str(node) for node in knot]
-    return " ".join(str_list)
+    def __repr__(self):
+        return " ".join([repr(node) for node in self])
 
-def render(knot):
-    # Get a name from a string and return the named string
-    knot_str = get_str(knot)
-    if knot_str in NAMED_KNOTS:
-        name = NAMED_KNOTS[knot_str]
-    else:
-        name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
-    return "The {}: {}".format(name, knot_str)
+    def __len__(self):
+        return len(self.sequence)
 
-def tiable(knot):
-    return knot[-4:] in (from_str("Ro Li Co Ti"), from_str("Lo Ri Co Ti"))
+    def __eq__(self, other):
+        return other.__eq__(self.sequence)
 
-def random_walk(walk=[]):
-        # print ("walk is ", get_str(walk))
+    def append(self, str):
+        self.sequence.append(Node(str))
+
+    def pop(self):
+        self.sequence.pop()
+
+    def final(self):
+        """
+        Return name of final node.
+        >>> Knot("Li").final()
+        'Li'
+        >>> Knot("Lo Ci Ro Li Co Ti").final()
+        'Ti'
+        """
+        return self.sequence[-1].shortname
+
+    def initial(self):
+        return self.sequence[0].shortname
+
+    def get_children(self):
+        """
+        Return possible moves of last node.
+        >>> sorted(Knot("Lo Ri Co").get_children())
+        ['Li', 'Ri', 'Ti']
+        """
+        return self[-1].get_children()
+
+    def finishable(self):
+        """
+        Whether the knot can be finished in its current state.
+        >>> Knot("Lo Ri Co").finishable()
+        True
+        """
+        return [str(node) for node in self[-3:]] in (["Ro", "Li", "Co"], ["Lo", "Ri", "Co"])
+
+    def tiable(self):
+        """
+        Whether a knot ends in one of the two allowed sequences.
+
+        >>> Knot("Lo Ri Co Li Ro Li Co Ti").tiable()
+        True
+        >>> Knot("Li Ro Ci Lo Co Ti").tiable()
+        False
+        """
+        return [str(node) for node in self[-4:]] in (['Ro', 'Li', 'Co', 'Ti'], ['Lo', 'Ri', 'Co', 'Ti'])
+
+    def two_away(self):
+        return [str(node) for node in self[-2:]] in (['Ro', 'Li'], ['Lo', 'Ri'])
+
+    def penultimate(self):
+        return len(self) == 8 and self.initial() == "Lo" or len(self) == 7 and self.initial() == 'Li'
+
+    def antepenultimate(self):
+        return len(self) == 7 and self.initial() == "Lo" or len(self) == 6 and self.initial() == 'Li'
+
+    def preantepenultimate(self):
+        return len(self) == 6 and self.initial() == "Lo" or len(self) == 5 and self.initial() == 'Li'
+
+    def mid_knot(self):
+        return ((1 <= len(self) < 6) and self.initial() == "Lo") or ((1 <= len(self) < 5) and self.initial() == 'Li')
+
+    def legal_moves(self):
+        """
+        Get legal moves in a given position in a knot.
+        >>> sorted((Knot("Lo Ri Co")).legal_moves())
+        ['Ci', 'Co', 'Li', 'Lo', 'Ri', 'Ro', 'Ti']
+        """
+        legal_moves = set([])
+        if self.penultimate():
+            legal_moves.add('Co')
+        elif self.antepenultimate() and not self.finishable():
+            legal_moves.update(['Li', 'Ri'])
+            if self.two_away():
+                legal_moves.add('Co')
+        elif self.preantepenultimate() and not self.finishable():
+            legal_moves.update(['Ro', 'Lo'])
+            if self.two_away():
+                legal_moves.add('Co')
+        elif self.mid_knot():
+            legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
+        if self.finishable():
+            legal_moves.add('Ti')
+        return legal_moves
+
+    def legal_intersection(self):
+        """
+        Get intersection between legal moves and available moves of active node.
+        >>> sorted(Knot("Li").legal_intersection())
+        ['Co', 'Ro']
+        >>> sorted(Knot("Lo Ri Co Ri Lo Ri Co").legal_intersection())
+        ['Ti']
+        >>> sorted(Knot("Lo Ri Co").legal_intersection())
+        ['Li', 'Ri', 'Ti']
+        >>> sorted(Knot("Lo").legal_intersection())
+        ['Ci', 'Ri']
+        """
+        return list(self.get_children() & self.legal_moves())
+
+    def one_step(self):
+        self.append(random.choice(self.legal_intersection()))
+
+    def render(self):
+        # Get a name from a string and return the named string
+        knot_str = str(self)
+        if knot_str in NAMED_KNOTS:
+            name = NAMED_KNOTS[knot_str]
+        else:
+            name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
+        return "The {}: {}".format(name, knot_str)
+
+    def random_walk(self, walk=None):
         if not walk:
-            return random_walk([starter()])
-        elif walk[-1].shortname == 'Ti' and tiable(walk):
-            return walk
-        elif walk[-1].shortname == 'Ti' and not tiable(walk):
-            return random_walk(walk[:-4])
+            return self.random_walk([starter()])
+        elif walk[-1].shortname == 'Ti' and Knot.tiable(walk):
+            self.sequence = walk
+        elif walk[-1].shortname == 'Ti' and not Knot.tiable(walk):
+            return self.random_walk(walk[:-4])
         elif len(walk) >= 9:
             if walk[-1].shortname == 'Co':
-                if finishable(walk):
-                    walk.append(Node('Ti'))
-                    return walk
+                if Knot.finishable(walk):
+                    walk.append('Ti')
+                    self.sequence = walk
                 else:
-                    return random_walk(walk[:-1])
-            # if walk[-1].shortname == 'Co':
-            #     walk.append(Node('Ti'))
-                return random_walk(walk)
+                    return self.random_walk(walk[:-1])
+                return self.random_walk(walk)
             else:
-                return random_walk(walk[:-3])
+                return self.random_walk(walk[:-3])
         else:
-            walk.append(Node(random.choice(list(walk[-1].get_children()))))
-            return random_walk(walk)
-            
-def produce(num=1):
-    # Generate n random unique knots
-    knots = set([])
-    while len(knots) < num:
-        knots.add(get_str(linear_build()))
-    return "\n".join(sorted(list(knots)))
+            walk.append(random.choice(list(walk[-1].get_children())))
+            return self.random_walk(walk)
 
-def named(num=1):
-    # Produce n unique named knots
-    knots = set([])
-    while len(knots) < min(num, 25):
-        knot = get_str(random_walk())
-        if knot in NAMED_KNOTS and knot not in knots:
-            print(knot)
-            knots.add(get_str(knot))
-    return knots
-
-def analyze(knot):
-    """
-    Report on Fink & Mao's metrics for a given knot.
-    >>> analyze(from_str("Li Co Li Ro Ci Ro Li Co Ti"))
-    <BLANKLINE>
-            The *co-Windsor 3: Li Co Li Ro Ci Ro Li Co Ti
-            Size: 8
-            Symmetry: -1
-            Balance: 2
-            This is a rather broad knot.
-            This knot will untie when pulled out.
-    <BLANKLINE>
-    """
-    l_r = (sum(1 for node in knot if node.name == "L"),
-              (sum(1 for node in knot if node.name == "R")))
-    centers = sum(1 for node in knot if node.name == "C")
-    size = len(knot) - 1
-    breadth = centers / size
-    symmetry = l_r[1] - l_r[0]
-    wise = ['-' if n[0] > n[1] else '+' for n in pairwise(knot[:-1])]
-    balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
-    knotted = True
-    if breadth < .25:
-        shape = "very narrow"
-    elif .25 <= breadth < .33:
-        shape = "rather narrow"
-    elif .33 <= breadth < .4:
-        shape = "rather broad"
-    elif .4 <= breadth:
-        shape = 'very broad'
-    if knot[-4:] == from_str("Ro Li Co Ti"):
-        knotted = False
-    
-    print("""
+    def analyze(self):
+        """
+        Report on Fink & Mao's metrics for a given knot.
+        >>> Knot("Li Co Li Ro Ci Ro Li Co Ti").analyze()
+        <BLANKLINE>
+                The *co-Windsor 3: Li Co Li Ro Ci Ro Li Co Ti
+                Size: 8
+                Symmetry: -1
+                Balance: 2
+                This is a rather broad knot.
+                This knot will untie when pulled out.
+        <BLANKLINE>
+        """
+        l_r = (sum(1 for node in self.sequence if node.direction == "L"),
+                  (sum(1 for node in self.sequence if node.direction == "R")))
+        centers = sum(1 for node in self.sequence if node.direction == "C")
+        size = len(self) - 1
+        breadth = centers / size
+        symmetry = l_r[1] - l_r[0]
+        wise = ['-' if n[0] > n[1] else '+' for n in pairwise(self[:-1])]
+        balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
+        knotted = True
+        if breadth < .25:
+            shape = "very narrow"
+        elif .25 <= breadth < .33:
+            shape = "rather narrow"
+        elif .33 <= breadth < .4:
+            shape = "rather broad"
+        elif .4 <= breadth:
+            shape = 'very broad'
+        if [str(node) for node in self[-4:]] == ["Ro", "Li", "Co", "Ti"]:
+            knotted = False
+        
+        print("""
         {render}
         Size: {size}
         Symmetry: {symmetry}
         Balance: {balance}
         This is a {shape} knot.
         This knot {knotted} untie when pulled out.
-        """.format(render=render(knot),size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
-  
+            """.format(render=self.render(),size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
+         
+class Node(object):
+    """
+    We implement a tie as a series of nodes. Each node is a sort of state machine
+    which can return its valid children depending on its current state.
+    """
+    def __init__(self, *args):
+        try:
+            dir, bit = args
+            self.direction = dir
+            self.bit = bit
+            self.shortname = "{}{}".format(SHORTNAMES[self.direction], SHORTNAMES[self.bit])
+        except ValueError:
+            self.shortname = args[0]
+            for key, value in SHORTNAMES.items():
+                if self.shortname[0] == value:
+                    self.direction = key
+                if self.shortname[1] == value:
+                    self.bit = key
+        if not (self.shortname and self.bit and self.direction):
+            raise AttributeError('Bad node created.')
+
+    def __repr__(self):
+        return "node {}.{}".format(self.direction, self.bit)
+
+    def __str__(self):
+        return self.shortname
+
+    def __eq__(self, other):
+        return self.shortname == other.shortname
+
+    def __gt__(self, other):
+        return (self.direction == "L" and other.direction == "R") or (self.direction == "R" and other.direction == "C") or (self.direction == "C" and other.direction == "L")
+
+    def get_children(self):
+        choices = flip(self.direction)
+        children = set([choices[0]+flip(self.bit), choices[1]+flip(self.bit)])
+        if self.shortname == "Co":
+            children.add('Ti')
+        elif self.shortname == "Ti":
+            children = set([])
+        return children
+
+def linear_build():
+    k = Knot()
+    while True:
+        # print('*' * 10)
+        # print("knot is", str(knot))
+        # print("children are", knot.get_children())
+        # print("legal moves are", legal_moves(knot))
+        # print("Intersection is", knot.get_children() & legal_moves(knot))
+        k.one_step()
+        if k.final() == "Ti":
+            return k
+            
+def produce(num=1):
+    # Generate n random unique knots
+    knots = set([])
+    while len(knots) < num:
+        knots.add(str(linear_build()))
+    return "\n".join(sorted(list(knots)))
+
+def named(num=1):
+    # Produce n unique named knots
+    knots = set([])
+    while len(knots) < min(num, 25):
+        knot = str(linear_build())
+        if knot in NAMED_KNOTS and knot not in knots:
+            print(Knot(knot).render())
+            knots.add(str(knot))
+
+ 
 def tie_a_tie():
     # Interactive tie tying.
     term = Terminal()
     with term.location(0,0):
         print(term.clear())
         starting_point = input("Start in or out? ").lower()
-        if starting_point in ["i", "i"]:
-            tie = [Node('Li')]
-        elif starting_point in ["o", "o"]:
-            tie = [Node('Lo')]
+        if starting_point in ["i", "in"]:
+            tie = Knot('Li')
+        elif starting_point in ["o", "out"]:
+            tie = Knot('Lo')
         else:
-            tie = [starter()]
-        while tie[-1] != Node('Ti'):
+            tie = Knot()
+        while tie.final() != 'Ti':
             print(term.clear())
-            choices = get_str(tie[-1].get_children())
-            tie_str = get_str(tie)
+            choices = str(tie.legal_intersection())
+            tie_str = str(tie)
             while True:
                 with term.location(0,3):
-                    possibilities = []
-                    for name in NAMED_KNOTS.keys():
-                        if tie_str == name[:len(tie_str)]:
-                            possibilities.append(NAMED_KNOTS[name])
+                    possibilities = [name for walk, name in NAMED_KNOTS.items() if tie_str == walk[:len(tie_str)]]
                     print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
-                next = input("Your knot so far: {}\nNext step ({}{}): ".format(tie_str, choices, 
+                next_step = input("Your knot so far: {}\nNext step ({}{}): ".format(tie_str, choices, 
                                                                         " back" if len(tie) > 1 else ""))
-                if next == "back":
+                if next_step == "back":
                     tie.pop()
                     break
                 else:
                     try:
-                        if next in choices:
-                            tie.append(Node(next))
+                        if next_step in choices:
+                            tie.append(next_step)
+                            break
+                        if next_step == "" and len(choices) == 1:
+                            tie.append(choices[0])
                             break
                         else: 
                             print(term.clear())
@@ -365,50 +477,7 @@ def tie_a_tie():
                             print(term.clear())
                             pass
         print(term.clear())
-    analyze(tie)
-
-
-class Node(object):
-    """
-    We implement a tie as a series of nodes. Each node is a sort of state machine
-    which can return its valid children depending on its current state.
-    """
-    def __init__(self, *args):
-        try:
-            name, bit = args
-            self.name = name
-            self.bit = bit
-            self.shortname = "{}{}".format(SHORTNAMES[self.name], SHORTNAMES[self.bit])
-        except ValueError:
-            self.shortname = args[0]
-            for key, value in SHORTNAMES.items():
-                if self.shortname[0] == value:
-                    self.name = key
-                if self.shortname[1] == value:
-                    self.bit = key
-        if not (self.shortname and self.bit and self.name):
-            raise AttributeError('Bad node created.')
-
-    def __repr__(self):
-        return "node {}.{}".format(self.name, self.bit)
-
-    def __str__(self):
-        return self.shortname
-
-    def __eq__(self, other):
-        return self.shortname == other.shortname
-
-    def __gt__(self, other):
-        return (self.name == "L" and other.name == "R") or (self.name == "R" and other.name == "C") or (self.name == "C" and other.name == "L")
-
-    def get_children(self):
-        choices = flip(self.name)
-        children = set([choices[0]+flip(self.bit), choices[1]+flip(self.bit)])
-        if self.shortname == "Co":
-            children.add('Ti')
-        elif self.shortname == "Ti":
-            children = set([])
-        return children
+    tie.analyze()
 
 if __name__ == "__main__":
     import doctest
@@ -416,6 +485,6 @@ if __name__ == "__main__":
 
     # print(produce(85))
     # tie_a_tie()
-    import cProfile
-    cProfile.run('produce(85)')
+    # import cProfile
+    # cProfile.run('produce(85)')
     # print(produce(85))
