@@ -439,8 +439,8 @@ def tie_a_tie():
                     possibilities = [name for walk, name in NAMED_KNOTS.items() if tie_str == walk[:len(tie_str)]]
                     print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
                 next_step = input("Your knot so far: {}\nNext step ({}{}): ".format(tie_str, choices, 
-                                                                        " back" if len(tie) > 1 else ""))
-                if next_step == "back":
+                                                                        " back" if len(tie) > 1 else "")).title()
+                if next_step == "Back":
                     tie.pop()
                     break
                 else:
