@@ -118,6 +118,7 @@ NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"
               ,"Lo Ci Ro Ci Lo Ci Ro Li Co Ti": "*Balthus"
               ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"
     }
+
 def through():
     return Node('T', 'i')
 
@@ -235,17 +236,25 @@ class Knot(object):
     def mid_knot(self):
         return ((1 <= len(self) < 6) and self.initial() == "Lo") or ((1 <= len(self) < 5) and self.initial() == 'Li')
 
-    RULES_MACHINE = { 'penultimate': ('Co',) 
-                     ,'antepenultimate': ('Li', 'Ri')
-                     ,'preantepenultimate': ('Ro','Lo')
-                     ,'two_away': ('Co',)
-                     ,'mid_knot': ('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co')
-                     ,'finishable': ('Ti',)
-        }
-    def add_rule(condition, moves):
-        pass
+    RULES_MACHINE = { antepenultimate: ('Li', 'Ri')
+                     ,preantepenultimate: ('Ro','Lo')
+                     ,two_away: ('Co',)
+                     ,mid_knot: ('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co')
+                     ,finishable: ('Ti',)
+                     }
 
     def legal_moves(self):
+        """
+        This is almost working. But it doesn't respect elifs.
+        """
+        legal_moves = set([])
+        for rule, moves in Knot.RULES_MACHINE.items():
+            if rule(self):
+                legal_moves.update(moves)
+        return legal_moves
+
+
+    def legal_moves_deprecated(self):
         """
         Get legal moves in a given position in a knot.
         >>> sorted((Knot("Lo Ri Co")).legal_moves())
@@ -480,6 +489,6 @@ if __name__ == "__main__":
 
     # print(produce(85))
     # tie_a_tie()
-    import cProfile
-    cProfile.run('produce(85)')
+    # import cProfile
+    # cProfile.run('produce(85)')
     # print(produce(85))
