@@ -226,9 +226,6 @@ class Knot(object):
     def two_away(self):
         return [str(node) for node in self[-2:]] in (['Ro', 'Li'], ['Lo', 'Ri'])
 
-    def penultimate(self):
-        return len(self) == 8 and self.initial() == "Lo" or len(self) == 7 and self.initial() == 'Li'
-
     def antepenultimate(self):
         return len(self) == 7 and self.initial() == "Lo" or len(self) == 6 and self.initial() == 'Li'
 
@@ -238,25 +235,34 @@ class Knot(object):
     def mid_knot(self):
         return ((1 <= len(self) < 6) and self.initial() == "Lo") or ((1 <= len(self) < 5) and self.initial() == 'Li')
 
+    RULES_MACHINE = { 'penultimate': ('Co',) 
+                     ,'antepenultimate': ('Li', 'Ri')
+                     ,'preantepenultimate': ('Ro','Lo')
+                     ,'two_away': ('Co',)
+                     ,'mid_knot': ('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co')
+                     ,'finishable': ('Ti',)
+        }
+    def add_rule(condition, moves):
+        pass
+
     def legal_moves(self):
         """
         Get legal moves in a given position in a knot.
         >>> sorted((Knot("Lo Ri Co")).legal_moves())
         ['Ci', 'Co', 'Li', 'Lo', 'Ri', 'Ro', 'Ti']
+
+        .penultimate() is unnecessary. Will there only ever be one rule for a given
+        set of legal moves, or is that coincidence?
         """
         legal_moves = set([])
-        if self.penultimate():
-            legal_moves.add('Co')
-        elif self.antepenultimate() and not self.finishable():
-            legal_moves.update(['Li', 'Ri'])
-            if self.two_away():
-                legal_moves.add('Co')
+        if self.antepenultimate() and not self.finishable():
+            legal_moves.update(['Li', 'Ri'])            
         elif self.preantepenultimate() and not self.finishable():
             legal_moves.update(['Ro', 'Lo'])
-            if self.two_away():
-                legal_moves.add('Co')
         elif self.mid_knot():
             legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
+        if self.two_away():
+            legal_moves.add('Co')
         if self.finishable():
             legal_moves.add('Ti')
         return legal_moves
@@ -297,7 +303,7 @@ class Knot(object):
         elif len(walk) >= 9:
             if walk[-1].shortname == 'Co':
                 if Knot.finishable(walk):
-                    walk.append('Ti')
+                    walk.append(Node('Ti'))
                     self.sequence = walk
                 else:
                     return self.random_walk(walk[:-1])
@@ -305,7 +311,7 @@ class Knot(object):
             else:
                 return self.random_walk(walk[:-3])
         else:
-            walk.append(random.choice(list(walk[-1].get_children())))
+            walk.append(Node(random.choice(list(walk[-1].get_children()))))
             return self.random_walk(walk)
 
     def analyze(self):
