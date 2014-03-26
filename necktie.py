@@ -353,7 +353,7 @@ class Knot(object):
         <BLANKLINE>
         """
         l_r = (sum(1 for node in self.sequence if node.direction == "L"),
-                  (sum(1 for node in self.sequence if node.direction == "R")))
+              (sum(1 for node in self.sequence if node.direction == "R")))
         centers = sum(1 for node in self.sequence if node.direction == "C")
         size = len(self) - 1
         breadth = centers / size
@@ -363,9 +363,9 @@ class Knot(object):
         knotted = True
         if breadth < .25:
             shape = "very narrow"
-        elif .25 <= breadth < .33:
+        elif .25 <= breadth < (1/3):
             shape = "rather narrow"
-        elif .33 <= breadth < .4:
+        elif (1/3) <= breadth < .4:
             shape = "rather broad"
         elif .4 <= breadth:
             shape = 'very broad'
@@ -433,14 +433,18 @@ def linear_build():
             return k
             
 def produce(num=1):
-    # Generate n random unique knots
+    """
+    Generate n random unique knots
+    """
     knots = set([])
     while len(knots) < num:
         knots.add(str(linear_build()))
     return "\n".join(sorted(list(knots)))
 
 def named(num=1):
-    # Produce n unique named knots
+    """
+    Produce n unique named knots
+    """
     knots = set([])
     while len(knots) < min(num, 25):
         knot = str(linear_build())
@@ -450,7 +454,9 @@ def named(num=1):
 
  
 def tie_a_tie():
-    # Interactive tie tying.
+    """
+    Interactive tie tying.
+    """
     def throw():
         print(term.clear())
         with term.location(10, term.height):
