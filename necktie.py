@@ -119,6 +119,9 @@ NAMED_KNOTS = {"Lo Ri Co Ti": "*Oriental"
               ,"Lo Ci Ro Ci Lo Ci Lo Ri Co Ti": "*co-Balthus"
     }
 
+RULES_MACHINE = []
+
+
 def through():
     return Node('T', 'i')
 
@@ -139,6 +142,8 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
+
+
 
 class Knot(object):
     """
@@ -204,7 +209,14 @@ class Knot(object):
         ['Li', 'Ri', 'Ti']
         """
         return self[-1].get_children()
+    
+    def add_rule(moves):
+        def decorator(func):
+            RULES_MACHINE.append((func, moves))
+            return func
+        return decorator
 
+    @add_rule(('Ti',))
     def finishable(self):
         """
         Whether the knot can be finished in its current state.
@@ -213,23 +225,14 @@ class Knot(object):
         """
         return [str(node) for node in self[-3:]] in (["Ro", "Li", "Co"], ["Lo", "Ri", "Co"])
 
-    def tiable(self):
-        """
-        Whether a knot ends in one of the two allowed sequences.
-
-        >>> Knot("Lo Ri Co Li Ro Li Co Ti").tiable()
-        True
-        >>> Knot("Li Ro Ci Lo Co Ti").tiable()
-        False
-        """
-        return [str(node) for node in self[-4:]] in (['Ro', 'Li', 'Co', 'Ti'], ['Lo', 'Ri', 'Co', 'Ti'])
-
+    @add_rule(('Co',))
     def two_away(self):
         """
         Whether a knot is ready to be completed with Co Ti.
         """
         return [str(node) for node in self[-2:]] in (['Ro', 'Li'], ['Lo', 'Ri'])
 
+    @add_rule(('Li', 'Ri', 'Ro', 'Lo'))
     def leadup(self):
         """
         Whether a knot is on the 'runway', where we have to begin the finishing sequence
@@ -237,14 +240,9 @@ class Knot(object):
         return not self.finishable() and (len(self) == 6 or (len(self) == 7 and self.initial() == "Lo")
                                                          or (len(self) == 5 and self.initial() == "Li"))
 
+    @add_rule(('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'))
     def mid_knot(self):
         return ((1 <= len(self) < 6) and self.initial() == "Lo") or ((1 <= len(self) < 5) and self.initial() == 'Li')
-
-    RULES_MACHINE = { leadup: ('Li', 'Ri', 'Ro', 'Lo')
-                     ,two_away: ('Co',)
-                     ,mid_knot: ('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co')
-                     ,finishable: ('Ti',)
-                     }
 
     def legal_moves(self):
         """
@@ -253,9 +251,9 @@ class Knot(object):
         ['Ci', 'Co', 'Li', 'Lo', 'Ri', 'Ro', 'Ti']
         """
         legal_moves = set([])
-        for rule, moves in Knot.RULES_MACHINE.items():
-            if rule(self):
-                legal_moves.update(moves)
+        for rule_moves in RULES_MACHINE:
+            if rule_moves[0](self):
+                legal_moves.update(rule_moves[1])
         return legal_moves
 
 
@@ -305,6 +303,17 @@ class Knot(object):
         else:
             name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
         return "The {}: {}".format(name, knot_str)
+
+    def tiable(self):
+        """
+        Whether a knot ends in one of the two allowed sequences.
+
+        >>> Knot("Lo Ri Co Li Ro Li Co Ti").tiable()
+        True
+        >>> Knot("Li Ro Ci Lo Co Ti").tiable()
+        False
+        """
+        return [str(node) for node in self[-4:]] in (['Ro', 'Li', 'Co', 'Ti'], ['Lo', 'Ri', 'Co', 'Ti'])
 
     def random_walk(self, walk=None):
         """
