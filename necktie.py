@@ -481,7 +481,7 @@ def tie_a_tie():
                     if next_step in choices:
                         tie.append(next_step)
                         break
-                    if not next_step and len(choices) == 1:
+                    if not next_step:
                         tie.append(choices[0])
                         break
                     else: 
