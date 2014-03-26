@@ -225,19 +225,22 @@ class Knot(object):
         return [str(node) for node in self[-4:]] in (['Ro', 'Li', 'Co', 'Ti'], ['Lo', 'Ri', 'Co', 'Ti'])
 
     def two_away(self):
+        """
+        Whether a knot is ready to be completed with Co Ti.
+        """
         return [str(node) for node in self[-2:]] in (['Ro', 'Li'], ['Lo', 'Ri'])
 
-    def antepenultimate(self):
-        return len(self) == 7 and self.initial() == "Lo" or len(self) == 6 and self.initial() == 'Li'
-
-    def preantepenultimate(self):
-        return len(self) == 6 and self.initial() == "Lo" or len(self) == 5 and self.initial() == 'Li'
+    def leadup(self):
+        """
+        Whether a knot is on the 'runway', where we have to begin the finishing sequence
+        """
+        return not self.finishable() and (len(self) == 6 or (len(self) == 7 and self.initial() == "Lo")
+                                                         or (len(self) == 5 and self.initial() == "Li"))
 
     def mid_knot(self):
         return ((1 <= len(self) < 6) and self.initial() == "Lo") or ((1 <= len(self) < 5) and self.initial() == 'Li')
 
-    RULES_MACHINE = { antepenultimate: ('Li', 'Ri')
-                     ,preantepenultimate: ('Ro','Lo')
+    RULES_MACHINE = { leadup: ('Li', 'Ri', 'Ro', 'Lo')
                      ,two_away: ('Co',)
                      ,mid_knot: ('Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co')
                      ,finishable: ('Ti',)
@@ -245,7 +248,9 @@ class Knot(object):
 
     def legal_moves(self):
         """
-        This is almost working. But it doesn't respect elifs.
+        Get legal moves in a given position in a knot.
+        >>> sorted((Knot("Lo Ri Co")).legal_moves())
+        ['Ci', 'Co', 'Li', 'Lo', 'Ri', 'Ro', 'Ti']
         """
         legal_moves = set([])
         for rule, moves in Knot.RULES_MACHINE.items():
@@ -254,27 +259,21 @@ class Knot(object):
         return legal_moves
 
 
-    def legal_moves_deprecated(self):
-        """
-        Get legal moves in a given position in a knot.
-        >>> sorted((Knot("Lo Ri Co")).legal_moves())
-        ['Ci', 'Co', 'Li', 'Lo', 'Ri', 'Ro', 'Ti']
-
-        .penultimate() is unnecessary. Will there only ever be one rule for a given
-        set of legal moves, or is that coincidence?
-        """
-        legal_moves = set([])
-        if self.antepenultimate() and not self.finishable():
-            legal_moves.update(['Li', 'Ri'])            
-        elif self.preantepenultimate() and not self.finishable():
-            legal_moves.update(['Ro', 'Lo'])
-        elif self.mid_knot():
-            legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
-        if self.two_away():
-            legal_moves.add('Co')
-        if self.finishable():
-            legal_moves.add('Ti')
-        return legal_moves
+    # def legal_moves_deprecated(self):
+       
+      
+    #     legal_moves = set([])
+    #     if self.antepenultimate():
+    #         legal_moves.update(['Li', 'Ri'])            
+    #     elif self.preantepenultimate():
+    #         legal_moves.update(['Ro', 'Lo'])
+    #     elif self.mid_knot():
+    #         legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
+    #     if self.two_away():
+    #         legal_moves.add('Co')
+    #     if self.finishable():
+    #         legal_moves.add('Ti')
+    #     return legal_moves
 
     def legal_intersection(self):
         """
@@ -291,10 +290,15 @@ class Knot(object):
         return list(self.get_children() & self.legal_moves())
 
     def one_step(self):
+        """
+        Add one guaranteed legal move to a knot
+        """
         self.append(random.choice(self.legal_intersection()))
 
     def render(self):
-        # Get a name from a string and return the named string
+        """
+        Get a name from a string and return the named string
+        """
         knot_str = str(self)
         if knot_str in NAMED_KNOTS:
             name = NAMED_KNOTS[knot_str]
@@ -303,6 +307,9 @@ class Knot(object):
         return "The {}: {}".format(name, knot_str)
 
     def random_walk(self, walk=None):
+        """
+        Build a knot by recursive algorithm. Mutates the knot's sequence.
+        """
         if not walk:
             return self.random_walk([starter()])
         elif walk[-1].shortname == 'Ti' and Knot.tiable(walk):
@@ -435,51 +442,52 @@ def named(num=1):
  
 def tie_a_tie():
     # Interactive tie tying.
-    term = Terminal()
-    with term.location(0,0):
+    def throw():
+        print(term.clear())
+        with term.location(10, term.height):
+            print("Please enter a valid choice.")
+            sleep(1)
+            print(term.clear())
+    def start_knot():
         print(term.clear())
         starting_point = input("Start in or out? ").lower()
         if starting_point in ["i", "in"]:
-            tie = Knot('Li')
+            return Knot('Li')
         elif starting_point in ["o", "out"]:
-            tie = Knot('Lo')
+            return Knot('Lo')
         else:
-            tie = Knot()
+            return Knot()
+
+    term = Terminal()
+    with term.location(0,0):
+        tie = start_knot()
         while tie.final() != 'Ti':
             print(term.clear())
-            choices = str(tie.legal_intersection())
+            choices = tie.legal_intersection()
             tie_str = str(tie)
-            while True:
-                with term.location(0,3):
-                    possibilities = [name for walk, name in NAMED_KNOTS.items() if tie_str == walk[:len(tie_str)]]
-                    print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
-                next_step = input("Your knot so far: {}\nNext step ({}{}): ".format(tie_str, choices, 
-                                                                        " back" if len(tie) > 1 else "")).title()
-                if next_step == "Back":
-                    tie.pop()
-                    break
-                else:
-                    try:
-                        if next_step in choices:
-                            tie.append(next_step)
-                            break
-                        if next_step == "" and len(choices) == 1:
-                            tie.append(choices[0])
-                            break
-                        else: 
-                            print(term.clear())
-                            with term.location(10, term.height):
-                                print("Please enter a valid choice.")
-                                sleep(1)
-                                print(term.clear())
-                                pass
-                    except:
-                        print(term.clear())
-                        with term.location(10, term.height):
-                            print("Please enter a valid choice.")
-                            sleep(1)
-                            print(term.clear())
-                            pass
+            try:
+                while True:
+                    with term.location(0,3):
+                        possibilities = [name for walk, name in NAMED_KNOTS.items() if tie_str == walk[:len(tie_str)]]
+                        print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
+                    next_step = input("Your knot so far: {}\nNext step ({}{}): "
+                                .format(tie_str, choices, " back" if len(tie) > 1 else "")).title()
+                    if next_step == "Back" and len(tie) > 1:
+                        tie.pop()
+                        break
+                    if next_step == "Back" and len(tie) == 1:
+                        tie = start_knot()
+                        break
+                    if next_step in choices:
+                        tie.append(next_step)
+                        break
+                    if not next_step and len(choices) == 1:
+                        tie.append(choices[0])
+                        break
+                    else: 
+                        throw()   
+            except:
+                throw()                 
         print(term.clear())
     tie.analyze()
 
@@ -488,7 +496,7 @@ if __name__ == "__main__":
     doctest.testmod()
 
     # print(produce(85))
-    # tie_a_tie()
+    tie_a_tie()
     # import cProfile
     # cProfile.run('produce(85)')
     # print(produce(85))
