@@ -471,7 +471,7 @@ def tie_a_tie():
                         possibilities = [name for walk, name in NAMED_KNOTS.items() if tie_str == walk[:len(tie_str)]]
                         print("\nPossible knots:\n{}\n".format("\n".join(possibilities)))
                     next_step = input("Your knot so far: {}\nNext step ({}{}): "
-                                .format(tie_str, choices, " back" if len(tie) > 1 else "")).title()
+                               .format(tie_str, choices, " back" if len(tie) > 1 else "")).title()
                     if next_step == "Back" and len(tie) > 1:
                         tie.pop()
                         break
@@ -496,7 +496,7 @@ if __name__ == "__main__":
     doctest.testmod()
 
     # print(produce(85))
-    tie_a_tie()
+    # tie_a_tie()
     # import cProfile
     # cProfile.run('produce(85)')
     # print(produce(85))
