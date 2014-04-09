@@ -5,6 +5,7 @@ import random
 from itertools import tee
 from blessings import Terminal
 from time import sleep
+from collections import namedtuple
 
 DIRECTIONS = {'L', 'R', 'C'}
 BITS = {"o", "i"}
@@ -256,23 +257,6 @@ class Knot(object):
                 legal_moves.update(rule_moves[1])
         return legal_moves
 
-
-    # def legal_moves_deprecated(self):
-       
-      
-    #     legal_moves = set([])
-    #     if self.antepenultimate():
-    #         legal_moves.update(['Li', 'Ri'])            
-    #     elif self.preantepenultimate():
-    #         legal_moves.update(['Ro', 'Lo'])
-    #     elif self.mid_knot():
-    #         legal_moves.update(['Ri', 'Ro', 'Li', 'Lo', 'Ci', 'Co'])
-    #     if self.two_away():
-    #         legal_moves.add('Co')
-    #     if self.finishable():
-    #         legal_moves.add('Ti')
-    #     return legal_moves
-
     def legal_intersection(self):
         """
         Get intersection between legal moves and available moves of active node.
@@ -338,7 +322,22 @@ class Knot(object):
         else:
             walk.append(Node(random.choice(list(walk[-1].get_children()))))
             return self.random_walk(walk)
-
+    
+    def __getattr__(self, attr):
+        if attr == "analysis":
+            l_r = (sum(1 for node in self.sequence if node.direction == "L"),
+                  (sum(1 for node in self.sequence if node.direction == "R")))
+            centers = sum(1 for node in self.sequence if node.direction == "C")
+            size = len(self) - 1
+            breadth = centers / size
+            symmetry = l_r[1] - l_r[0]
+            wise = ['-' if n[0] > n[1] else '+' for n in pairwise(self[:-1])]
+            balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
+            knotted = False if [str(node) for node in self[-4:]] == ["Ro", "Li", "Co", "Ti"] else True
+            return Analysis(size, symmetry, balance, breadth, knotted)
+        else:
+            raise AttributeError
+            
     def analyze(self):
         """
         Report on Fink & Mao's metrics for a given knot.
@@ -352,15 +351,9 @@ class Knot(object):
                 This knot will untie when pulled out.
         <BLANKLINE>
         """
-        l_r = (sum(1 for node in self.sequence if node.direction == "L"),
-              (sum(1 for node in self.sequence if node.direction == "R")))
-        centers = sum(1 for node in self.sequence if node.direction == "C")
-        size = len(self) - 1
-        breadth = centers / size
-        symmetry = l_r[1] - l_r[0]
-        wise = ['-' if n[0] > n[1] else '+' for n in pairwise(self[:-1])]
-        balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
-        knotted = True
+        analysis = self.analysis
+        breadth = analysis.breadth
+
         if breadth < .25:
             shape = "very narrow"
         elif .25 <= breadth < (1/3):
@@ -369,9 +362,7 @@ class Knot(object):
             shape = "rather broad"
         elif .4 <= breadth:
             shape = 'very broad'
-        if [str(node) for node in self[-4:]] == ["Ro", "Li", "Co", "Ti"]:
-            knotted = False
-        
+
         print("""
         {render}
         Size: {size}
@@ -379,8 +370,12 @@ class Knot(object):
         Balance: {balance}
         This is a {shape} knot.
         This knot {knotted} untie when pulled out.
-            """.format(render=self.render(),size=size, shape=shape, symmetry=symmetry, balance=balance, knotted=('will not' if knotted else 'will')))
-         
+            """.format(render=self.render(),size=analysis.size, shape=shape, 
+                       symmetry=analysis.symmetry, balance=analysis.balance, 
+                       knotted=('will not' if analysis.knotted else 'will')))
+
+Analysis = namedtuple('Analysis', ['size', 'symmetry', 'balance','breadth', 'knotted'])
+        
 class Node(object):
     """
     We implement a tie as a series of nodes. Each node is a sort of state machine
@@ -421,6 +416,9 @@ class Node(object):
         return children
 
 def linear_build():
+    """
+    A knot generating algorithm that never makes a wrong move.
+    """
     k = Knot()
     while True:
         # print('*' * 10)
