@@ -9,8 +9,11 @@
 <body>
 <div class=page>
   <h1><a href="{{ url_for('recommend') }}">neck_web</a></h1>
-  <h2>Custom neckties, algorithmically generated for style</h3>
+  <h2>Custom neckties, algorithmically generated for maximum style</h3>
   
   {% block body %}{% endblock %}
+</div>
+<div class=footer>
+<p>This app makes use of <a href="http://github.com/subsetpark/necktie"><em>necktie.py</em></a>, a Python library written by <a href="http://zdsmith.com">Z. D. Smith</a>, which library is an exploration of the ideas introduced in the paper by Thomas Fink and Young Mao, <em>Designing Ties by Random Walks</em>. For more information see the <a href="http://blog.zdsmith.com/designing-tie-knots-by-random-walks.html">blog post on the subject.</a></p>
 </div>
 </body>
