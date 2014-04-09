@@ -337,7 +337,7 @@ class Knot(object):
             return Analysis(size, symmetry, balance, breadth, knotted)
         else:
             raise AttributeError
-            
+
     def analyze(self):
         """
         Report on Fink & Mao's metrics for a given knot.
@@ -363,16 +363,21 @@ class Knot(object):
         elif .4 <= breadth:
             shape = 'very broad'
 
-        print("""
-        {render}
-        Size: {size}
-        Symmetry: {symmetry}
-        Balance: {balance}
-        This is a {shape} knot.
-        This knot {knotted} untie when pulled out.
-            """.format(render=self.render(),size=analysis.size, shape=shape, 
-                       symmetry=analysis.symmetry, balance=analysis.balance, 
-                       knotted=('will not' if analysis.knotted else 'will')))
+        response = """
+            {render}
+            Size: {size}
+            Symmetry: {symmetry}
+            Balance: {balance}
+            This is a {shape} knot.
+            This knot {knotted} untie when pulled out.
+                """.format(render=self.render(),size=analysis.size, shape=shape, 
+                           symmetry=analysis.symmetry, balance=analysis.balance, 
+                           knotted=('will not' if analysis.knotted else 'will'))
+        if __name__ == "__main__":
+            print(response)
+        else:
+            return response
+
 
 Analysis = namedtuple('Analysis', ['size', 'symmetry', 'balance','breadth', 'knotted'])
         
@@ -450,6 +455,31 @@ def named(num=1):
             print(Knot(knot).render())
             knots.add(str(knot))
 
+def recommend_a_tie(thickness=None, collar=None):
+    def is_large(k):
+        return k.analysis.size > 6
+    while thickness not in ("thick", "thin", ""):
+        thickness = input("Is your tie made of thin material or thick? [N/A] ").lower()
+    while collar not in ("wide", "narrow", ""):
+        collar = input("Is your collar wide or narrow? [N/A] ").lower()
+
+    sym_pref = 1
+    if thickness:
+        size_pref = (lambda k: k.analysis.size < 6) if thickness == "thick" else (lambda k: k.analysis.size >= 6)
+    if collar:
+        broad_pref = (lambda k: k.analysis.breadth >= (1/3)) if collar == "wide" else (lambda k: k.analysis.breadth < (1/3))
+
+    while True:
+        k = linear_build()
+        # import pdb
+        # pdb.set_trace()
+        if abs(k.analysis.symmetry) > sym_pref:
+            continue
+        if thickness and not size_pref(k):
+            continue
+        if collar and not broad_pref(k):
+            continue
+        return k
  
 def tie_a_tie():
     """
@@ -513,3 +543,5 @@ if __name__ == "__main__":
     # import cProfile
     # cProfile.run('produce(85)')
     # print(produce(85))
+    # linear_build().analyze()
+    recommend_a_tie()
