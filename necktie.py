@@ -276,17 +276,18 @@ class Knot(object):
         Add one guaranteed legal move to a knot
         """
         self.append(random.choice(self.legal_intersection()))
+    def get_name(self):
+        knot_str = str(self)
+        if knot_str in NAMED_KNOTS:
+            return NAMED_KNOTS[knot_str]
+        else:
+            return KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
 
     def render(self):
         """
         Get a name from a string and return the named string
         """
-        knot_str = str(self)
-        if knot_str in NAMED_KNOTS:
-            name = NAMED_KNOTS[knot_str]
-        else:
-            name = KNOT_NAMES[hash(knot_str) % len(KNOT_NAMES)]
-        return "The {}: {}".format(name, knot_str)
+        return "The {}: {}".format(self.get_name(), str(self))
 
     def tiable(self):
         """
@@ -325,6 +326,7 @@ class Knot(object):
     
     def __getattr__(self, attr):
         if attr == "analysis":
+            name = self.get_name()
             l_r = (sum(1 for node in self.sequence if node.direction == "L"),
                   (sum(1 for node in self.sequence if node.direction == "R")))
             centers = sum(1 for node in self.sequence if node.direction == "C")
@@ -334,7 +336,7 @@ class Knot(object):
             wise = ['-' if n[0] > n[1] else '+' for n in pairwise(self[:-1])]
             balance = sum([1 for k in pairwise(wise) if k[0] != k[1]])
             knotted = False if [str(node) for node in self[-4:]] == ["Ro", "Li", "Co", "Ti"] else True
-            return Analysis(size, symmetry, balance, breadth, knotted)
+            return Analysis(name, size, symmetry, balance, breadth, knotted)
         else:
             raise AttributeError
 
@@ -379,7 +381,7 @@ class Knot(object):
             return response
 
 
-Analysis = namedtuple('Analysis', ['size', 'symmetry', 'balance','breadth', 'knotted'])
+Analysis = namedtuple('Analysis', ['name', 'size', 'symmetry', 'balance','breadth', 'knotted'])
         
 class Node(object):
     """

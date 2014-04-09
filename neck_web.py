@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import necktie
+import necktie, re
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -21,11 +21,11 @@ def step_three():
         thickness = ""
     if collar == "none":
         collar = ""
-    recommended = necktie.recommend_a_tie(thickness=thickness, collar=collar).analyze()
-    
-    rec_lines = recommended.splitlines()
-    name = rec_lines[1].split()[1].strip("*").strip(":")
-    sequence = " ".join(rec_lines[1].split()[2:])
+    recommended = necktie.recommend_a_tie(thickness=thickness, collar=collar)
+    analysis = recommended.analyze()
+    rec_lines = analysis.splitlines()
+    name = recommended.analysis.name.strip("*")
+    sequence = str(recommended)
     description = rec_lines[2:7]
 
     return render_template('step_three.html', name=name, sequence=sequence, description=description)
