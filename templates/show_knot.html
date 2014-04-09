@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h3>{{ slug }}</h3>
+<h3><small>THE</small> <big>{{ k.name }}</big></h3>
+<strong><em>{{ k.sequence }}</em></strong>
+<ul>
+{% for line in k.description %}
+    <li><em>{{ line }}</em></li>
+{% endfor %}
+</ul>
+
+</form>
+
+{% endblock %}

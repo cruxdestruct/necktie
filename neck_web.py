@@ -1,10 +1,18 @@
 from flask import Flask, render_template, request
-import necktie, re
+import necktie, random
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+def rand_header():
+    return random.choice(["Custom necktie knots, algorithmically generated for maximum style",
+                         "Men's fashion without the pictures"])
+
 @app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/recommend")
 def recommend():
    return render_template('recommend.html')
 
@@ -24,11 +32,23 @@ def step_three():
     recommended = necktie.recommend_a_tie(thickness=thickness, collar=collar)
     analysis = recommended.analyze()
     rec_lines = analysis.splitlines()
-    name = recommended.analysis.name.strip("*")
-    sequence = str(recommended)
-    description = rec_lines[2:7]
+    k = {'name' : recommended.analysis.name.strip("*"),
+         'sequence' : str(recommended),
+         'description' : rec_lines[2:7]
+         }
+    return render_template('show_knot.html', k = k, slug="neck_web recommends...")
 
-    return render_template('step_three.html', name=name, sequence=sequence, description=description)
+@app.route("/random")
+def random_knot():
+    knot = necktie.linear_build()
+    analysis = knot.analyze()
+    knot_lines = analysis.splitlines()
+    k = {'name' : knot.analysis.name.strip("*"),
+         'sequence' : str(knot),
+         'description' : knot_lines[2:7]
+         }
+    return render_template('show_knot.html', k = k, slug="behold,") 
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
