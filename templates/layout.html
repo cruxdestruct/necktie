@@ -1,0 +1,16 @@
+<!doctype html>
+<title>neck_web</title>
+<head>
+<link rel=stylesheet type='text/css' href="{{ url_for('static', filename='style.css') }}">
+
+
+
+</head>
+<body>
+<div class=page>
+  <h1><a href="{{ url_for('recommend') }}">neck_web</a></h1>
+  <h2>Custom neckties, algorithmically generated for style</h3>
+  
+  {% block body %}{% endblock %}
+</div>
+</body>

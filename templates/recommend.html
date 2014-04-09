@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h3>Please make your choice:</h3>
+  <ol>
+    <li><a href="{{ url_for('step_two') }}?thickness=thick">My tie is made of thick material.</a></li>
+    <li><a href="{{ url_for('step_two') }}?thickness=thin">My tie is made of thin material.</a></li>
+    <li><a href="{{ url_for('step_two') }}?thickness=none">Who cares how thick it is?</a></li>
+  </ol>
+
+{% endblock %}
