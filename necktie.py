@@ -364,15 +364,15 @@ class Knot(object):
             shape = 'very broad'
 
         response = """
-            {render}
-            Size: {size}
-            Symmetry: {symmetry}
-            Balance: {balance}
-            This is a {shape} knot.
-            This knot {knotted} untie when pulled out.
-                """.format(render=self.render(),size=analysis.size, shape=shape, 
-                           symmetry=analysis.symmetry, balance=analysis.balance, 
-                           knotted=('will not' if analysis.knotted else 'will'))
+        {render}
+        Size: {size}
+        Symmetry: {symmetry}
+        Balance: {balance}
+        This is a {shape} knot.
+        This knot {knotted} untie when pulled out.
+            """.format(render=self.render(),size=analysis.size, shape=shape, 
+                       symmetry=analysis.symmetry, balance=analysis.balance, 
+                       knotted=('will not' if analysis.knotted else 'will'))
         if __name__ == "__main__":
             print(response)
         else:
@@ -426,11 +426,6 @@ def linear_build():
     """
     k = Knot()
     while True:
-        # print('*' * 10)
-        # print("knot is", str(knot))
-        # print("children are", knot.get_children())
-        # print("legal moves are", legal_moves(knot))
-        # print("Intersection is", knot.get_children() & legal_moves(knot))
         k.one_step()
         if k.final() == "Ti":
             return k
@@ -544,4 +539,4 @@ if __name__ == "__main__":
     # cProfile.run('produce(85)')
     # print(produce(85))
     # linear_build().analyze()
-    recommend_a_tie()
+    recommend_a_tie().analyze()
