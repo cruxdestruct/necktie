@@ -64,5 +64,5 @@ def tie_a_tie():
         return render_template('tie_a_tie.html', walk=tie_str, choices=choices, qs=walk_url, p=possibilities)
 
 if __name__ == "__main__":
-    app.debug = True
+    # app.debug = True
     app.run()
