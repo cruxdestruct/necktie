@@ -4,10 +4,6 @@ import necktie, random, urllib.parse
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-def rand_header():
-    return random.choice(["Custom necktie knots, algorithmically generated for maximum style",
-                         "Men's fashion without the pictures"])
-
 def prepare_for_display(knot):
     analysis = knot.analyze()
     knot_lines = analysis.splitlines()
@@ -38,7 +34,7 @@ def step_three():
     if collar == "none":
         collar = ""
     k = prepare_for_display(necktie.recommend_a_tie(thickness=thickness, collar=collar))
-    return render_template('show_knot.html', k = k, slug="neck_web recommends...")
+    return render_template('show_knot.html', k = k, slug="neck_web recommends&#8230;")
 
 @app.route("/random")
 def random_knot():

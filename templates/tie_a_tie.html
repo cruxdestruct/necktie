@@ -2,19 +2,17 @@
 
 {% block body %}
 
-<h1>Tie a Tie!</h1>
-
 <h3>Your knot so far:</h3>
-<p>{{ walk }}</p>
+<p><em>{{ walk }}</em></p>
 
-<h3>Your choices</h3>
+<h3>Your choices:</h3>
 <ul>
 {% for choice in choices %}
 <li><a href="{{url_for('tie_a_tie') }}?walk={{ qs }}+{{ choice }}">{{ choice }}</a></li>
 {% endfor %}
 
 </ul>
-<h3>Possible knots</h3>
+<h3>Possible knots:</h3>
 <ul>
 {% for possibility in p %}
 <li>{{ possibility }}</li>
